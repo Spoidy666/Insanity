@@ -16,7 +16,7 @@ void showTransactionDetailsDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: ConstrainedBox(
           constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height * 0.8,
+            maxHeight: MediaQuery.of(context).size.height * 0.7,
           ),
           child: Column(
             children: [
@@ -129,8 +129,6 @@ void showTransactionDetailsDialog(
                         ),
                       ),
                     ),
-
-                    const SizedBox(height: 8),
 
                     SizedBox(
                       width: double.infinity,

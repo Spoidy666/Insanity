@@ -20,24 +20,23 @@ class PaymentsPage extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const CustomBoldText(text: "Expenses", size: 20),
-                  ValueListenableBuilder<DateTime?>(
-                    valueListenable: selectedMonthNotifier,
-                    builder: (context, month, _) {
-                      return TextButton.icon(
+      body: ValueListenableBuilder<DateTime?>(
+        valueListenable: selectedMonthNotifier,
+        builder: (context, month, _) {
+          return CustomScrollView(
+            physics: const BouncingScrollPhysics(),
+            slivers: [
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const CustomBoldText(text: "Expenses", size: 20),
+                      TextButton.icon(
                         onLongPress: () {
                           selectedMonthNotifier.value = null;
                         },
-
                         onPressed: () async {
                           final picked = await showDatePicker(
                             context: context,
@@ -47,7 +46,6 @@ class PaymentsPage extends StatelessWidget {
                             initialDatePickerMode: DatePickerMode.day,
                             builder: (context, child) {
                               final theme = Theme.of(context);
-
                               return Theme(
                                 data: theme.copyWith(
                                   textButtonTheme: TextButtonThemeData(
@@ -81,16 +79,13 @@ class PaymentsPage extends StatelessWidget {
                             color: Theme.of(context).colorScheme.tertiary,
                           ),
                         ),
-                      );
-                    },
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
-            ValueListenableBuilder<DateTime?>(
-              valueListenable: selectedMonthNotifier,
-              builder: (context, month, _) {
-                return SingleChildScrollView(
+              SliverToBoxAdapter(
+                child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   physics: const BouncingScrollPhysics(),
                   child: Row(
@@ -99,7 +94,7 @@ class PaymentsPage extends StatelessWidget {
                         width: screenWidth,
                         child: ExpensePieChartCard(
                           type: Type.expense,
-                          month: month, // nullable
+                          month: month,
                         ),
                       ),
                       SizedBox(
@@ -111,22 +106,18 @@ class PaymentsPage extends StatelessWidget {
                       ),
                     ],
                   ),
-                );
-              },
-            ),
+                ),
+              ),
 
-            ValueListenableBuilder<DateTime?>(
-              valueListenable: selectedMonthNotifier,
-              builder: (context, month, _) {
-                return RecentTransactions(
-                  filter: TransactionFilter.expense,
-                  month: month,
-                );
-              },
-            ),
-          ],
-        ),
+              RecentTransactions(
+                filter: TransactionFilter.expense,
+                month: month,
+              ),
+            ],
+          );
+        },
       ),
+
       floatingActionButton: CustomFloatingActionButton(
         onTap: () {
           showModalBottomSheet(

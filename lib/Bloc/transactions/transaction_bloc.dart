@@ -2,63 +2,76 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:spring_autumn/Bloc/transactions/transaction__event.dart';
 import 'package:spring_autumn/Bloc/transactions/transaction_state.dart';
 import 'package:spring_autumn/Database/database_helper.dart';
+class TransactionBloc
+    extends Bloc<TransactionEvent, TransactionState> {
+  TransactionBloc() : super(TransactionLoading()) {
+    on<LoadTransactions>(_load);
+    on<TransactionAdded>(_load);
+    on<TransactionDeleted>(_load);
+    on<TransactionUpdated>(_load);
+  }
 
-class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
-  int _calculateBalance(List<Map<String, Object?>> data) {
-    int balance = 0;
+  Future<void> _load(
+    TransactionEvent event,
+    Emitter<TransactionState> emit,
+  ) async {
+    emit(TransactionLoading());
 
-    for (final tx in data) {
-      final amount = tx['amount'] as int;
-      final type = tx['type'] as String;
+    final transactions = await getAllTransactions();
+    final categoryMap = await _loadCategoryMap();
+    final balances = _calculateMethodBalances(transactions);
 
-      if (type == 'income') {
-        balance += amount;
-      } else {
-        balance -= amount;
-      }
-    }
-
-    return balance;
+    emit(
+      TransactionLoaded(
+        transactions,
+        categoryMap,
+        cash: balances['cash']!,
+        card: balances['card']!,
+        upi: balances['upi']!,
+      ),
+    );
   }
 
   Future<Map<String, String>> _loadCategoryMap() async {
     final categories = await getAllCategories();
-
-    return {for (final c in categories) c['id'] as String: c['name'] as String};
+    return {
+      for (final c in categories)
+        c['id'] as String: c['name'] as String,
+    };
   }
 
-  TransactionBloc() : super(TransactionLoading()) {
-    on<LoadTransactions>((event, emit) async {
-      emit(TransactionLoading());
+  Map<String, int> _calculateMethodBalances(
+    List<Map<String, Object?>> data,
+  ) {
+    int cash = 0;
+    int card = 0;
+    int upi = 0;
 
-      final transactions = await getAllTransactions();
-      final categoryMap = await _loadCategoryMap();
-      final balance = _calculateBalance(transactions);
+    for (final tx in data) {
+      final amount = tx['amount'] as int;
+      final type = tx['type'] as String;
+      final method = tx['method'] as String;
 
-      emit(TransactionLoaded(transactions, categoryMap, balance));
-    });
+      final signedAmount =
+          type == 'income' ? amount : -amount;
 
-    on<TransactionAdded>((event, emit) async {
-      final transactions = await getAllTransactions();
-      final categoryMap = await _loadCategoryMap();
-      final balance = _calculateBalance(transactions);
+      switch (method) {
+        case 'cash':
+          cash += signedAmount;
+          break;
+        case 'card':
+          card += signedAmount;
+          break;
+        case 'upi':
+          upi += signedAmount;
+          break;
+      }
+    }
 
-      emit(TransactionLoaded(transactions, categoryMap, balance));
-    });
-    on<TransactionDeleted>((event, emit) async {
-      final transactions = await getAllTransactions();
-      final categoryMap = await _loadCategoryMap();
-      final balance = _calculateBalance(transactions);
-
-      emit(TransactionLoaded(transactions, categoryMap, balance));
-    });
-    on<TransactionUpdated>((event, emit) async {
-  final transactions = await getAllTransactions();
-  final categoryMap = await _loadCategoryMap();
-  final balance = _calculateBalance(transactions);
-
-  emit(TransactionLoaded(transactions, categoryMap, balance));
-});
-
+    return {
+      'cash': cash,
+      'card': card,
+      'upi': upi,
+    };
   }
 }

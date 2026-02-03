@@ -20,7 +20,7 @@ class CustomDrawerButton extends StatelessWidget {
 
     return SizedBox(
       width: double.infinity,
-      height: 50,
+      height: 45,
       child: ElevatedButton(
         onPressed: onTap,
         style: ElevatedButton.styleFrom(
@@ -37,7 +37,7 @@ class CustomDrawerButton extends StatelessWidget {
               name,
               style: TextStyle(
                 color: isActive ? Colors.white : scheme.tertiary,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w800,
               ),
             ),
           ],

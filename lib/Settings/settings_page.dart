@@ -4,6 +4,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:spring_autumn/Bloc/theme_state.dart';
 import 'package:spring_autumn/Pages/about_page.dart';
 import 'package:spring_autumn/Pages/profile_page.dart';
+import 'package:spring_autumn/Settings/importSettings.dart';
 import 'package:spring_autumn/Widgets/custom_primary_text.dart';
 import 'package:spring_autumn/Widgets/theme_toggle.dart';
 
@@ -22,21 +23,20 @@ class SettingsPage extends StatelessWidget {
           },
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              BlocBuilder<ThemeBloc, ThemeState>(
-                builder: (context, state) {
-                  final isDark = state.themeData.brightness == Brightness.dark;
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            BlocBuilder<ThemeBloc, ThemeState>(
+              builder: (context, state) {
+                final isDark = state.themeData.brightness == Brightness.dark;
 
-                  return Container(
-                    height: 700,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
+                return Container(
+                  height: 700,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(4, 0, 4, 0),
                     child: Column(
                       children: [
                         SettingsListTile(
@@ -58,10 +58,13 @@ class SettingsPage extends StatelessWidget {
                           contentPadding: EdgeInsets.zero,
                           title: Row(
                             children: [
-                              SizedBox(width: 15),
+                              const SizedBox(width: 15),
                               Icon(Iconsax.brush),
-                              SizedBox(width: 10),
-                              Text("Theme Mode"),
+                              const SizedBox(width: 10),
+                              Text(
+                                "Theme Mode",
+                                style: TextStyle(fontSize: 17),
+                              ),
                             ],
                           ),
                           trailing: Padding(
@@ -74,7 +77,21 @@ class SettingsPage extends StatelessWidget {
                             ),
                           ),
                         ),
-                        Divider(thickness: 0.1),
+                        const Divider(thickness: 0.1),
+                        SettingsListTile(
+                          i: Iconsax.import_1,
+                          title: "Import and Export",
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (ctx) {
+                                  return ImportExportPage();
+                                },
+                              ),
+                            );
+                          },
+                        ),
+                        const Divider(thickness: 0.1),
                         SettingsListTile(
                           i: Iconsax.info_circle,
                           title: "About",
@@ -88,14 +105,14 @@ class SettingsPage extends StatelessWidget {
                             );
                           },
                         ),
-                        Divider(thickness: 0.1),
+                        const Divider(thickness: 0.1),
                       ],
                     ),
-                  );
-                },
-              ),
-            ],
-          ),
+                  ),
+                );
+              },
+            ),
+          ],
         ),
       ),
     );
@@ -120,7 +137,7 @@ class SettingsListTile extends StatelessWidget {
       title: Row(
         children: [
           Icon(i),
-          SizedBox(width: 10),
+          const SizedBox(width: 10),
           CustomPrimaryText(text: title, size: 17),
         ],
       ),

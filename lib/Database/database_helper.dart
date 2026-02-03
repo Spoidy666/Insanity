@@ -129,3 +129,43 @@ Future<void> updateTransaction(TransactionModel value) async {
     whereArgs: [value.id],
   );
 }
+
+Future<bool> transactionExists({
+  required String title,
+  required int amount,
+  required String categoryId,
+  required int timestamp,
+  required String type,
+  required String method,
+}) async {
+  final result = await _db.query(
+    'transactions',
+    where: '''
+      title = ? AND
+      amount = ? AND
+      category_id = ? AND
+      transaction_timestamp = ? AND
+      type = ? AND
+      method = ?
+    ''',
+    whereArgs: [title, amount, categoryId, timestamp, type, method],
+    limit: 1,
+  );
+
+  return result.isNotEmpty;
+}
+Future<List<Map<String, Object?>>> getTransactionsForExport() async {
+  return await _db.rawQuery('''
+    SELECT 
+      t.title,
+      c.name AS category,
+      t.notes,
+      t.amount,
+      t.type,
+      t.method,
+      t.transaction_timestamp
+    FROM transactions t
+    JOIN categories c ON t.category_id = c.id
+    ORDER BY t.transaction_timestamp DESC
+  ''');
+}

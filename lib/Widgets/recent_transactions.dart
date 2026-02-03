@@ -13,6 +13,7 @@ enum TransactionFilter { all, income, expense }
 class RecentTransactions extends StatelessWidget {
   final TransactionFilter filter;
   final DateTime? month;
+
   const RecentTransactions({
     super.key,
     required this.filter,
@@ -24,7 +25,9 @@ class RecentTransactions extends StatelessWidget {
     return BlocBuilder<TransactionBloc, TransactionState>(
       builder: (context, state) {
         if (state is TransactionLoading) {
-          return const Center(child: CircularProgressIndicator());
+          return const SliverFillRemaining(
+            child: Center(child: CircularProgressIndicator()),
+          );
         }
 
         if (state is TransactionLoaded) {
@@ -32,7 +35,6 @@ class RecentTransactions extends StatelessWidget {
               state.transactions.where((tx) {
                 final type = tx['type'] as String;
 
-                // ---- TYPE FILTER ----
                 switch (filter) {
                   case TransactionFilter.income:
                     if (type != 'income') return false;
@@ -44,8 +46,6 @@ class RecentTransactions extends StatelessWidget {
                     break;
                 }
 
-                // ---- MONTH FILTER ----
-                // ---- MONTH FILTER (optional) ----
                 if (month != null) {
                   final txDate = DateTime.fromMillisecondsSinceEpoch(
                     tx['transaction_timestamp'] as int,
@@ -65,14 +65,13 @@ class RecentTransactions extends StatelessWidget {
               );
 
           if (filteredTransactions.isEmpty) {
-            return const Center(child: Text('No transactions yet'));
+            return const SliverFillRemaining(
+              child: Center(child: Text('No transactions yet')),
+            );
           }
 
-          return ListView.builder(
-            physics: const BouncingScrollPhysics(),
-            shrinkWrap: true,
-            itemCount: filteredTransactions.length,
-            itemBuilder: (context, index) {
+          return SliverList(
+            delegate: SliverChildBuilderDelegate((context, index) {
               final tx = filteredTransactions[index];
 
               final timestamp = tx['transaction_timestamp'] as int;
@@ -89,30 +88,43 @@ class RecentTransactions extends StatelessWidget {
 
               final showHeader = currentMonth != previousMonth;
 
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (showHeader)
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                      child: Text(
-                        currentMonth,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey,
+              return TweenAnimationBuilder<double>(
+                tween: Tween(begin: 0, end: 1),
+                duration: const Duration(milliseconds: 550),
+                curve: Curves.easeOut,
+                builder: (context, value, child) {
+                  return Opacity(
+                    opacity: value,
+                    child: Transform.translate(
+                      offset: Offset(0, 8 * (1 - value)),
+                      child: child,
+                    ),
+                  );
+                },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (showHeader)
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                        child: Text(
+                          currentMonth,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey,
+                          ),
                         ),
                       ),
-                    ),
-
-                  TransactionSlidableTile(tx: tx, categoryName: categoryName),
-                ],
+                    TransactionSlidableTile(tx: tx, categoryName: categoryName),
+                  ],
+                ),
               );
-            },
+            }, childCount: filteredTransactions.length),
           );
         }
 
-        return const SizedBox.shrink();
+        return const SliverToBoxAdapter(child: SizedBox.shrink());
       },
     );
   }
