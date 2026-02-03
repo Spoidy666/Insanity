@@ -1,0 +1,118 @@
+import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
+import 'package:spring_autumn/Widgets/add_transaction_sheet.dart';
+import 'package:spring_autumn/Widgets/custom_bold_text.dart';
+import 'package:spring_autumn/Widgets/custom_floating_action_button.dart';
+import 'package:spring_autumn/Widgets/home_balance_container.dart';
+import 'package:spring_autumn/Widgets/recent_transactions.dart';
+
+final ValueNotifier<DateTime?> selectedMonthNotifier = ValueNotifier<DateTime?>(
+  null,
+);
+
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Column(
+          children: [
+            HomeBalanceContainer(),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const CustomBoldText(text: "Recent Transactions", size: 20),
+
+                  ValueListenableBuilder<DateTime?>(
+                    valueListenable: selectedMonthNotifier,
+                    builder: (context, month, _) {
+                      return TextButton.icon(
+                        onLongPress: () {
+                          selectedMonthNotifier.value = null;
+                        },
+
+                        onPressed: () async {
+                          final picked = await showDatePicker(
+                            context: context,
+                            initialDate: month,
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime.now(),
+                            initialDatePickerMode: DatePickerMode.day,
+                            builder: (context, child) {
+                              final theme = Theme.of(context);
+
+                              return Theme(
+                                data: theme.copyWith(
+                                  colorScheme: theme.colorScheme,
+                                  textButtonTheme: TextButtonThemeData(
+                                    style: TextButton.styleFrom(
+                                      foregroundColor:
+                                          theme.colorScheme.tertiary,
+                                    ),
+                                  ),
+                                ),
+                                child: child!,
+                              );
+                            },
+                          );
+
+                          if (picked != null) {
+                            selectedMonthNotifier.value = DateTime(
+                              picked.year,
+                              picked.month,
+                            );
+                          }
+                        },
+                        icon: Icon(
+                          Iconsax.calendar_edit,
+                          color: Theme.of(context).colorScheme.tertiary,
+                        ),
+                        label: Text(
+                          month == null
+                              ? "All time"
+                              : "${month.month}/${month.year}",
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.tertiary,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+
+            ValueListenableBuilder<DateTime?>(
+              valueListenable: selectedMonthNotifier,
+              builder: (context, month, _) {
+                return RecentTransactions(
+                  filter: TransactionFilter.all,
+                  month: month,
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: CustomFloatingActionButton(
+        onTap: () {
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: Theme.of(context).colorScheme.surface,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+            ),
+            builder: (_) => const AddTransactionSheet(),
+          );
+        },
+        icon: Iconsax.wallet_add_1,
+      ),
+    );
+  }
+}
