@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:spring_autumn/Bloc/currency/currency_cubit.dart';
+import 'package:spring_autumn/Bloc/profile/profile_cubit.dart';
 import 'package:spring_autumn/Bloc/theme_state.dart';
 import 'package:spring_autumn/Bloc/transactions/transaction__event.dart';
 import 'package:spring_autumn/Bloc/transactions/transaction_bloc.dart';
@@ -20,6 +22,8 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider<ThemeBloc>(create: (_) => ThemeBloc()),
+        BlocProvider(create: (_) => CurrencyCubit()),
+        BlocProvider(create: (_) => ProfileCubit()),
         BlocProvider<TransactionBloc>(
           create: (_) => TransactionBloc()..add(LoadTransactions()),
         ),

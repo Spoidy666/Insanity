@@ -34,7 +34,7 @@ class ExpenseBarChartCard extends StatelessWidget {
 
       final categoryId = tx['category_id'] as String;
       final categoryName = categoryMap[categoryId] ?? 'Unknown';
-      final amount = (tx['amount'] as int).toDouble();
+      final amount = (tx['amount'] as num).toDouble();
 
       data[categoryName] = (data[categoryName] ?? 0) + amount;
     }

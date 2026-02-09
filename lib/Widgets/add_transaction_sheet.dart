@@ -333,7 +333,7 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
                       return;
                     }
 
-                    final amount = int.tryParse(amountController.text);
+                    final amount = double.tryParse(amountController.text);
                     if (amount == null || amount <= 0) {
                       CustomSnackbar.show(
                         context,

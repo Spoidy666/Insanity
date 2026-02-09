@@ -1,6 +1,8 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
+import 'package:spring_autumn/Bloc/currency/currency_cubit.dart';
 import 'package:spring_autumn/Bloc/transactions/transaction_bloc.dart';
 import 'package:spring_autumn/Bloc/transactions/transaction_state.dart';
 import 'package:spring_autumn/Model/transaction_model.dart';
@@ -33,7 +35,7 @@ class ExpensePieChartCard extends StatelessWidget {
 
       final categoryId = tx['category_id'] as String;
       final categoryName = categoryMap[categoryId] ?? 'Unknown';
-      final amount = (tx['amount'] as int).toDouble();
+      final amount = (tx['amount'] as num).toDouble();
 
       data[categoryName] = (data[categoryName] ?? 0) + amount;
     }
@@ -116,30 +118,42 @@ class ExpensePieChartCard extends StatelessWidget {
               ),
 
               const SizedBox(height: 16),
-              Column(
-                children: data.entries.map((e) {
-                  final color = colorMap[e.key]!;
+              BlocBuilder<CurrencyCubit, AppCurrency>(
+                builder: (context, currency) {
+                  return Column(
+                    children: data.entries.map((e) {
+                      final color = colorMap[e.key]!;
 
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 12,
-                          height: 12,
-                          decoration: BoxDecoration(
-                            color: color,
-
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 12,
+                              height: 12,
+                              decoration: BoxDecoration(
+                                color: color,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(child: Text(e.key)),
+                            Text(
+                              NumberFormat.currency(
+                                locale: currency.locale,
+                                symbol: currency.symbol,
+                                decimalDigits: currency.decimalDigits,
+                              ).format(e.value),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 8),
-                        Expanded(child: Text(e.key)),
-                        Text("₹${e.value.toInt()}"),
-                      ],
-                    ),
+                      );
+                    }).toList(),
                   );
-                }).toList(),
+                },
               ),
             ],
           ),

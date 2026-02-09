@@ -66,6 +66,7 @@ Future<void> importCsvTransactions(BuildContext context) async {
 
   final rows = const CsvToListConverter(
     shouldParseNumbers: false,
+    eol: '\n',
   ).convert(csvString);
 
   if (rows.length <= 1) return;
@@ -84,8 +85,9 @@ Future<void> importCsvTransactions(BuildContext context) async {
           rawCat[0].toUpperCase() + rawCat.substring(1).toLowerCase();
 
       final notes = row[2]?.toString().trim();
-      final rawAmount = num.tryParse(row[3].toString()) ?? 0;
-      final amount = rawAmount.toInt().abs();
+      final rawAmount = num.tryParse(row[3].toString().trim()) ?? 0;
+      final double amount = rawAmount.toDouble().abs();
+
       final typeStr = row[4].toString().trim().toLowerCase();
       final methodStr = row[5].toString().trim().toLowerCase();
       final type = typeStr.contains('income') ? Type.income : Type.expense;
@@ -159,6 +161,7 @@ Future<void> importCsvTransactions(BuildContext context) async {
         backgroundColor: imported > 0 ? Colors.green : Colors.red,
       ),
     );
+    await getAllTransactions();
   }
 }
 
@@ -212,7 +215,6 @@ Future<void> exportTransactionsToCsv(BuildContext context) async {
     return;
   }
 
-  // DESKTOP: user-chosen save dialog
   final directory = await getDownloadsDirectory();
   final file = File(
     '${directory!.path}/transactions_export_${DateTime.now().millisecondsSinceEpoch}.csv',

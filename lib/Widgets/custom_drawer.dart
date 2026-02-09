@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:spring_autumn/Bloc/theme_state.dart';
@@ -24,136 +23,142 @@ class CustomDrawer extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        body: SizedBox(
-          width: 170,
-          child: Padding(
-            padding: const EdgeInsets.only(top: 50, left: 15),
-            child: Column(
-              children: [
-                Container(
-                  width: double.infinity,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: Colors.blueGrey,
-                  ),
-                  child: const Center(
-                    child: Text(
-                      "Insanity",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
+        body: Container(
+          color: Theme.of(context).colorScheme.surface,
+          child: SizedBox(
+            width: 170,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 50, left: 15),
+              child: Column(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.blueGrey,
+                    ),
+                    child: const Center(
+                      child: Text(
+                        "Insanity",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
-                ),
 
-                const Divider(thickness: 0.3, height: 30),
+                  const Divider(thickness: 0.3, height: 30),
 
-                Expanded(
-                  child: SingleChildScrollView(
-                    physics: BouncingScrollPhysics(),
-                    child: Column(
-                      children: [
-                        CustomDrawerButton(
-                          name: "Home",
-                          onTap: () => onItemTap(0),
-                          isActive: currentIndex == 0,
-                          i: Iconsax.home_2,
-                        ),
-                        const SizedBox(height: 10),
-                        CustomDrawerButton(
-                          name: "Wallet",
-                          onTap: () => onItemTap(1),
-                          isActive: currentIndex == 1,
-                          i: Iconsax.wallet,
-                        ),
-                        const SizedBox(height: 10),
-                        CustomDrawerButton(
-                          name: "Expenses",
-                          onTap: () => onItemTap(2),
-                          isActive: currentIndex == 2,
-                          i: Iconsax.money,
-                        ),
-                        const SizedBox(height: 10),
-                        CustomDrawerButton(
-                          name: "Savings",
-                          onTap: () => onItemTap(3),
-                          isActive: currentIndex == 3,
-                          i: Iconsax.wallet_money,
-                        ),
-                        const SizedBox(height: 10),
-                        CustomDrawerButton(
-                          name: "Plan",
-                          onTap: () => onItemTap(4),
-                          isActive: currentIndex == 4,
-                          i: Iconsax.graph,
-                        ),
-                        const SizedBox(height: 10),
-                        CustomDrawerButton(
-                          name: "Graphs",
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) =>
-                                    const VisualRepresentationPage(),
-                              ),
-                            );
-                          },
-                          isActive: false,
-                          i: Iconsax.status,
-                        ),
-                        const SizedBox(height: 10),
-                        CustomDrawerButton(
-                          name: "Import",
-                          onTap: () => showImportCsvDialog(context),
-                          isActive: false,
-                          i: Iconsax.import_1,
-                        ),
-                        const SizedBox(height: 10),
-                      ],
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 10),
-                BlocBuilder<ThemeBloc, ThemeState>(
-                  builder: (context, state) {
-                    final isDark =
-                        state.themeData.brightness == Brightness.dark;
-                    return DrawerThemeToggle(
-                      isDark: isDark,
-                      onToggle: () =>
-                          context.read<ThemeBloc>().add(ToggleTheme()),
-                    );
-                  },
-                ),
-                const SizedBox(height: 10),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      child: Column(
+                        children: [
+                          CustomDrawerButton(
+                            name: "Home",
+                            onTap: () => onItemTap(0),
+                            isActive: currentIndex == 0,
+                            i: Iconsax.home_2,
+                          ),
+                          const SizedBox(height: 10),
+                          CustomDrawerButton(
+                            name: "Wallet",
+                            onTap: () => onItemTap(1),
+                            isActive: currentIndex == 1,
+                            i: Iconsax.wallet,
+                          ),
+                          const SizedBox(height: 10),
+                          CustomDrawerButton(
+                            name: "Expenses",
+                            onTap: () => onItemTap(2),
+                            isActive: currentIndex == 2,
+                            i: Iconsax.money,
+                          ),
+                          const SizedBox(height: 10),
+                          CustomDrawerButton(
+                            name: "Savings",
+                            onTap: () => onItemTap(3),
+                            isActive: currentIndex == 3,
+                            i: Iconsax.wallet_money,
+                          ),
+                          const SizedBox(height: 10),
+                          CustomDrawerButton(
+                            name: "Plan",
+                            onTap: () => onItemTap(4),
+                            isActive: currentIndex == 4,
+                            i: Iconsax.graph,
+                          ),
+                          const SizedBox(height: 10),
+                          CustomDrawerButton(
+                            name: "Graphs",
+                            onTap: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      const VisualRepresentationPage(),
+                                ),
+                              );
+                            },
+                            isActive: false,
+                            i: Iconsax.status,
+                          ),
+                          const SizedBox(height: 10),
+                          CustomDrawerButton(
+                            name: "Import",
+                            onTap: () => showImportCsvDialog(context),
+                            isActive: false,
+                            i: Iconsax.import_1,
+                          ),
+                          const SizedBox(height: 10),
+                        ],
                       ),
                     ),
-                    onPressed: () {
-                      Navigator.of(
-                        context,
-                      ).push(MaterialPageRoute(builder: (_) => SettingsPage()));
+                  ),
+
+                  BlocBuilder<ThemeBloc, ThemeState>(
+                    builder: (context, state) {
+                      final isDark =
+                          state.themeData.brightness == Brightness.dark;
+                      return DrawerThemeToggle(
+                        isDark: isDark,
+                        onToggle: () =>
+                            context.read<ThemeBloc>().add(ToggleTheme()),
+                      );
                     },
-                    child: Icon(
-                      Iconsax.setting_24,
-                      size: 25,
-                      color: Theme.of(context).colorScheme.tertiary,
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const SettingsPage(),
+                          ),
+                        );
+                      },
+                      child: Icon(
+                        Iconsax.setting_24,
+                        size: 25,
+                        color: Theme.of(context).colorScheme.tertiary,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 10),
-              ],
+
+                  const SizedBox(height: 10),
+                ],
+              ),
             ),
           ),
         ),
@@ -175,18 +180,15 @@ class DrawerScaffold extends StatefulWidget {
   });
 
   @override
-  DrawerScaffoldState createState() => DrawerScaffoldState();
+  State<DrawerScaffold> createState() => DrawerScaffoldState();
 }
 
 class DrawerScaffoldState extends State<DrawerScaffold>
     with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _curvedAnimation;
+  late final AnimationController _controller;
+  late final Animation<double> _animation;
+
   final double maxSlide = 180;
-  void navigateTo(int index) {
-    widget.onNavigate(index);
-    toggleDrawer();
-  }
 
   @override
   void initState() {
@@ -196,7 +198,7 @@ class DrawerScaffoldState extends State<DrawerScaffold>
       duration: const Duration(milliseconds: 300),
     );
 
-    _curvedAnimation = CurvedAnimation(
+    _animation = CurvedAnimation(
       parent: _controller,
       curve: Curves.easeInOutCubic,
     );
@@ -206,20 +208,21 @@ class DrawerScaffoldState extends State<DrawerScaffold>
       _controller.isDismissed ? _controller.forward() : _controller.reverse();
 
   void _onDragUpdate(DragUpdateDetails details) {
-    _controller.value += details.primaryDelta! / maxSlide;
+    _controller.value = (_controller.value + details.primaryDelta! / maxSlide)
+        .clamp(0.0, 1.0);
   }
 
   void _onDragEnd(DragEndDetails details) {
-    if (_controller.isDismissed || _controller.isCompleted) return;
-
-    if (details.velocity.pixelsPerSecond.dx.abs() >= 365) {
-      double visualVelocity = details.velocity.pixelsPerSecond.dx / maxSlide;
-      _controller.fling(velocity: visualVelocity);
-    } else if (_controller.value < 0.5) {
+    if (_controller.value < 0.5) {
       _controller.reverse();
     } else {
       _controller.forward();
     }
+  }
+
+  void navigateTo(int index) {
+    widget.onNavigate(index);
+    toggleDrawer();
   }
 
   @override
@@ -230,66 +233,59 @@ class DrawerScaffoldState extends State<DrawerScaffold>
 
   @override
   Widget build(BuildContext context) {
+    final isDark =
+        context.watch<ThemeBloc>().state.themeData.brightness ==
+        Brightness.dark;
+
     return GestureDetector(
       onHorizontalDragUpdate: _onDragUpdate,
       onHorizontalDragEnd: _onDragEnd,
       child: AnimatedBuilder(
-        animation: _controller,
+        animation: _animation,
         builder: (context, _) {
-          double slide = maxSlide * _curvedAnimation.value;
-          double radius = _curvedAnimation.value * 30;
+          final slide = maxSlide * _animation.value;
+          final radius = 30 * _animation.value;
 
           return Stack(
             children: [
-              CustomDrawer(
-                onItemTap: navigateTo,
-                currentIndex: widget.currentIndex,
+              RepaintBoundary(
+                child: Opacity(
+                  opacity: 0.7 + (0.3 * _animation.value),
+                  child: Transform(
+                    alignment: Alignment.centerLeft,
+                    transform: Matrix4.identity()
+                      ..translate(-60 * (1 - _animation.value))
+                      ..scale(0.95 + (0.05 * _animation.value), 1.0),
+                    child: CustomDrawer(
+                      onItemTap: navigateTo,
+                      currentIndex: widget.currentIndex,
+                    ),
+                  ),
+                ),
               ),
+
               Transform(
-                transform: Matrix4.identity()..translate(slide),
                 alignment: Alignment.centerLeft,
-                child: Container(
-                  decoration: BoxDecoration(
-                    boxShadow: [
-                      if (_controller.value > 0)
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.2),
-                          blurRadius: 25,
-                          spreadRadius: 5,
-                          offset: const Offset(-10, 0),
+                transform: Matrix4.identity()..translate(slide),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(radius),
+                  child: Stack(
+                    children: [
+                      widget.child,
+                      if (_animation.value > 0)
+                        GestureDetector(
+                          onTap: toggleDrawer,
+                          child: Container(
+                            color: isDark
+                                ? Colors.grey.shade700.withOpacity(
+                                    0.15 * _animation.value,
+                                  )
+                                : Colors.black.withOpacity(
+                                    0.60 * _animation.value,
+                                  ),
+                          ),
                         ),
                     ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(radius),
-                    child: Stack(
-                      children: [
-                        widget.child,
-
-                        if (_controller.value > 0)
-                          GestureDetector(
-                            onTap: _curvedAnimation.value > 0.1
-                                ? toggleDrawer
-                                : null,
-                            child: BlocBuilder<ThemeBloc, ThemeState>(
-                              builder: (context, state) {
-                                final isDark =
-                                    state.themeData.brightness ==
-                                    Brightness.dark;
-                                return Container(
-                                  color: isDark
-                                      ? Colors.grey.shade700.withValues(
-                                          alpha: 0.15 * _curvedAnimation.value,
-                                        )
-                                      : Colors.black.withValues(
-                                          alpha: 0.60 * _curvedAnimation.value,
-                                        ),
-                                );
-                              },
-                            ),
-                          ),
-                      ],
-                    ),
                   ),
                 ),
               ),

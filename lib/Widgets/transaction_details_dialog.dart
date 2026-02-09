@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
+import 'package:spring_autumn/Bloc/currency/currency_cubit.dart';
 import 'package:spring_autumn/Model/transaction_model.dart';
 import 'package:spring_autumn/Widgets/edit_transaction_sheet.dart';
 
@@ -41,11 +44,22 @@ void showTransactionDetailsDialog(
                         _detailRow("Title", transaction.title, context),
                         const Divider(thickness: 0.3),
 
-                        _detailRow(
-                          "Amount",
-                          transaction.amount.toString(),
-                          context,
+                        BlocBuilder<CurrencyCubit, AppCurrency>(
+                          builder: (context, currency) {
+                            final formatter = NumberFormat.currency(
+                              locale: currency.locale,
+                              symbol: currency.symbol,
+                              decimalDigits: currency.decimalDigits,
+                            );
+
+                            return _detailRow(
+                              "Amount",
+                              formatter.format(transaction.amount),
+                              context,
+                            );
+                          },
                         ),
+
                         const Divider(thickness: 0.3),
 
                         _detailRow(
@@ -86,6 +100,8 @@ void showTransactionDetailsDialog(
                           ).toString(),
                           context,
                         ),
+                        const Divider(thickness: 0.3),
+                        _detailRow("id", transaction.id, context),
                       ],
                     ),
                   ),

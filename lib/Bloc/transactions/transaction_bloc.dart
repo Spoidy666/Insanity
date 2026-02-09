@@ -2,8 +2,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:spring_autumn/Bloc/transactions/transaction__event.dart';
 import 'package:spring_autumn/Bloc/transactions/transaction_state.dart';
 import 'package:spring_autumn/Database/database_helper.dart';
-class TransactionBloc
-    extends Bloc<TransactionEvent, TransactionState> {
+
+class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
   TransactionBloc() : super(TransactionLoading()) {
     on<LoadTransactions>(_load);
     on<TransactionAdded>(_load);
@@ -34,26 +34,21 @@ class TransactionBloc
 
   Future<Map<String, String>> _loadCategoryMap() async {
     final categories = await getAllCategories();
-    return {
-      for (final c in categories)
-        c['id'] as String: c['name'] as String,
-    };
+    return {for (final c in categories) c['id'] as String: c['name'] as String};
   }
 
-  Map<String, int> _calculateMethodBalances(
-    List<Map<String, Object?>> data,
-  ) {
-    int cash = 0;
-    int card = 0;
-    int upi = 0;
+  Map<String, double> _calculateMethodBalances(List<Map<String, Object?>> data) {
+    double cash = 0;
+    double card = 0;
+    double upi = 0;
 
     for (final tx in data) {
-      final amount = tx['amount'] as int;
+      final amount = (tx['amount'] as num).toDouble();
+
       final type = tx['type'] as String;
       final method = tx['method'] as String;
 
-      final signedAmount =
-          type == 'income' ? amount : -amount;
+      final signedAmount = type == 'income' ? amount : -amount;
 
       switch (method) {
         case 'cash':
@@ -68,10 +63,6 @@ class TransactionBloc
       }
     }
 
-    return {
-      'cash': cash,
-      'card': card,
-      'upi': upi,
-    };
+    return {'cash': cash, 'card': card, 'upi': upi};
   }
 }

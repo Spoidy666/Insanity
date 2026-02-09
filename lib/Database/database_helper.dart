@@ -9,7 +9,7 @@ Future<void> initializeDatabase() async {
 
   _db = await openDatabase(
     path,
-    version: 1,
+    version: 2,
     onConfigure: (db) async {
       await db.execute('PRAGMA foreign_keys = ON');
     },
@@ -55,6 +55,51 @@ Future<void> initializeDatabase() async {
         'CREATE INDEX idx_transactions_category ON transactions(category_id);',
       );
     },
+    onUpgrade: (db, oldVersion, newVersion) async {
+      if (oldVersion < 2) {
+        await db.execute('''
+      CREATE TABLE transactions_new (
+        id TEXT PRIMARY KEY,
+        title TEXT NOT NULL,
+        category_id TEXT NOT NULL,
+        notes TEXT,
+        amount REAL NOT NULL CHECK (amount >= 0),
+        type TEXT NOT NULL CHECK (type IN ('income', 'expense')),
+        method TEXT NOT NULL CHECK (method IN ('upi', 'cash', 'card')),
+        transaction_timestamp INTEGER NOT NULL,
+        created_at INTEGER NOT NULL,
+        FOREIGN KEY (category_id) REFERENCES categories(id)
+          ON DELETE RESTRICT
+          ON UPDATE CASCADE
+      );
+    ''');
+
+        await db.execute('''
+      INSERT INTO transactions_new (
+        id, title, category_id, notes, amount,
+        type, method, transaction_timestamp, created_at
+      )
+      SELECT 
+        id, title, category_id, notes, amount,
+        type, method, transaction_timestamp, created_at
+      FROM transactions;
+    ''');
+
+        await db.execute('DROP TABLE transactions;');
+
+        await db.execute(
+          'ALTER TABLE transactions_new RENAME TO transactions;',
+        );
+
+        await db.execute(
+          'CREATE INDEX idx_transactions_date ON transactions(transaction_timestamp);',
+        );
+
+        await db.execute(
+          'CREATE INDEX idx_transactions_category ON transactions(category_id);',
+        );
+      }
+    },
   );
 }
 
@@ -93,7 +138,8 @@ Future<void> insertCategory(String name) async {
   }
 
   await _db.insert('categories', {
-    'id': 'uuid-$trimmedName-${DateTime.now().millisecondsSinceEpoch}',
+    'id':
+        'uuid-${normalizedName.toLowerCase()}-${DateTime.now().millisecondsSinceEpoch}',
     'name': normalizedName,
   }, conflictAlgorithm: ConflictAlgorithm.ignore);
 }
@@ -132,7 +178,7 @@ Future<void> updateTransaction(TransactionModel value) async {
 
 Future<bool> transactionExists({
   required String title,
-  required int amount,
+  required double amount,
   required String categoryId,
   required int timestamp,
   required String type,
@@ -154,18 +200,19 @@ Future<bool> transactionExists({
 
   return result.isNotEmpty;
 }
+
 Future<List<Map<String, Object?>>> getTransactionsForExport() async {
   return await _db.rawQuery('''
     SELECT 
       t.title,
-      c.name AS category,
+      IFNULL(c.name, 'Unknown') AS category, 
       t.notes,
       t.amount,
       t.type,
       t.method,
       t.transaction_timestamp
     FROM transactions t
-    JOIN categories c ON t.category_id = c.id
-    ORDER BY t.transaction_timestamp DESC
+    LEFT JOIN categories c ON t.category_id = c.id
+    ORDER BY t.transaction_timestamp ASC
   ''');
 }

@@ -275,7 +275,7 @@ class _EditTransactionSheetState extends State<EditTransactionSheet> {
   }
 
   Future<void> _saveChanges() async {
-    final amount = int.tryParse(amountController.text.trim());
+    final amount = double.tryParse(amountController.text.trim());
 
     if (titleController.text.trim().isEmpty || amount == null || amount <= 0) {
       CustomSnackbar.show(context, message: "Invalid input");

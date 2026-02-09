@@ -7,7 +7,7 @@ class TransactionModel {
   String title;
   String categoryId;
   String? notes;
-  int amount;
+  double amount;
   Type type;
   Method method;
 
@@ -30,7 +30,7 @@ class TransactionModel {
       DateTime.fromMillisecondsSinceEpoch(transactionTimestamp);
   TransactionModel copyWith({
     String? title,
-    int? amount,
+    double? amount,
     String? notes,
     Type? type,
     Method? method,

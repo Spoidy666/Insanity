@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:spring_autumn/Bloc/transactions/transaction__event.dart';
 import 'package:spring_autumn/Bloc/transactions/transaction_bloc.dart';
@@ -70,57 +71,57 @@ class RecentTransactions extends StatelessWidget {
             );
           }
 
-          return SliverList(
-            delegate: SliverChildBuilderDelegate((context, index) {
-              final tx = filteredTransactions[index];
+          return AnimationLimiter(
+            child: SliverList(
+              delegate: SliverChildBuilderDelegate((context, index) {
+                final tx = filteredTransactions[index];
 
-              final timestamp = tx['transaction_timestamp'] as int;
-              final categoryId = tx['category_id'] as String;
-              final categoryName = state.categoryMap[categoryId] ?? "Unknown";
+                final timestamp = tx['transaction_timestamp'] as int;
+                final categoryId = tx['category_id'] as String;
+                final categoryName = state.categoryMap[categoryId] ?? "Unknown";
 
-              final currentMonth = _monthLabel(timestamp);
-              final previousMonth = index == 0
-                  ? null
-                  : _monthLabel(
-                      filteredTransactions[index - 1]['transaction_timestamp']
-                          as int,
-                    );
+                final currentMonth = _monthLabel(timestamp);
+                final previousMonth = index == 0
+                    ? null
+                    : _monthLabel(
+                        filteredTransactions[index - 1]['transaction_timestamp']
+                            as int,
+                      );
 
-              final showHeader = currentMonth != previousMonth;
+                final showHeader = currentMonth != previousMonth;
 
-              return TweenAnimationBuilder<double>(
-                tween: Tween(begin: 0, end: 1),
-                duration: const Duration(milliseconds: 550),
-                curve: Curves.easeOut,
-                builder: (context, value, child) {
-                  return Opacity(
-                    opacity: value,
-                    child: Transform.translate(
-                      offset: Offset(0, 8 * (1 - value)),
-                      child: child,
-                    ),
-                  );
-                },
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (showHeader)
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                        child: Text(
-                          currentMonth,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey,
+                return AnimationConfiguration.staggeredList(
+                  position: index,
+                  duration: const Duration(milliseconds: 220),
+                  child: SlideAnimation(
+                    verticalOffset: 20,
+                    child: FadeInAnimation(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (showHeader)
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(12, 16, 16, 8),
+                              child: Text(
+                                currentMonth,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ),
+                          TransactionSlidableTile(
+                            tx: tx,
+                            categoryName: categoryName,
                           ),
-                        ),
+                        ],
                       ),
-                    TransactionSlidableTile(tx: tx, categoryName: categoryName),
-                  ],
-                ),
-              );
-            }, childCount: filteredTransactions.length),
+                    ),
+                  ),
+                );
+              }, childCount: filteredTransactions.length),
+            ),
           );
         }
 
