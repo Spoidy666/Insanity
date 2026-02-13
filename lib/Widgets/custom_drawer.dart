@@ -213,10 +213,21 @@ class DrawerScaffoldState extends State<DrawerScaffold>
   }
 
   void _onDragEnd(DragEndDetails details) {
-    if (_controller.value < 0.5) {
-      _controller.reverse();
-    } else {
+    final velocity = details.velocity.pixelsPerSecond.dx;
+
+    if (velocity.abs() > 200) {
+      if (velocity > 0) {
+        _controller.forward();
+      } else {
+        _controller.reverse();
+      }
+      return;
+    }
+
+    if (_controller.value > 0.2) {
       _controller.forward();
+    } else {
+      _controller.reverse();
     }
   }
 

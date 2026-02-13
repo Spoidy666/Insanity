@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:spring_autumn/Widgets/bar_graph.dart';
+import 'package:spring_autumn/Widgets/line_chart.dart';
 import 'package:spring_autumn/Widgets/modern_type_tab.dart';
 import 'package:spring_autumn/Widgets/piechart.dart';
 import 'package:spring_autumn/Model/transaction_model.dart';
@@ -17,7 +18,7 @@ class _VisualRepresentationPageState extends State<VisualRepresentationPage> {
   Type selectedType = Type.expense;
   late final PageController _pageController;
 
-  DateTime? selectedMonth; // nullable → all time by default
+  DateTime? selectedMonth;
 
   @override
   void initState() {
@@ -159,7 +160,9 @@ class ChartsSection extends StatelessWidget {
             ExpensePieChartCard(type: type, month: month),
             const SizedBox(height: 40),
             ExpenseBarChartCard(type: type, month: month),
-            const SizedBox(height: 20),
+            const SizedBox(height: 40),
+            ExpenseLineChartCard(type: type, month: month),
+            const SizedBox(height: 40),
           ],
         ),
       ),

@@ -18,26 +18,20 @@ class DrawerThemeToggle extends StatelessWidget {
         padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
-          color: colorScheme.tertiary,
+          color: Colors.grey,
         ),
 
         child: Stack(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(5, 7, 30, 0),
+              padding: const EdgeInsets.fromLTRB(5, 7, 30, 9),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   SizedBox(width: 16),
-                  Icon(Icons.sunny, size: 18, color: Colors.grey),
+                  Icon(Icons.sunny, size: 18, color: Colors.white),
                   SizedBox(width: 24),
-                  Icon(
-                    Icons.dark_mode,
-                    size: 18,
-                    color: isDark
-                        ? Colors.white
-                        : Theme.of(context).colorScheme.secondary,
-                  ),
+                  Icon(Icons.dark_mode, size: 18, color: Colors.black),
                 ],
               ),
             ),
@@ -66,10 +60,10 @@ class DrawerThemeToggle extends StatelessWidget {
                     return ScaleTransition(scale: animation, child: child);
                   },
                   child: Icon(
-                    isDark ? Icons.dark_mode_rounded : Icons.sunny,
+                    isDark ? Icons.circle : Icons.sunny,
                     key: ValueKey(isDark),
-                    size: 25,
-                    color: isDark ? Colors.grey.shade900 : Colors.white,
+                    size: 27,
+                    color: isDark ? Colors.black : Colors.white,
                   ),
                 ),
               ),

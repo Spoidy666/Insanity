@@ -7,6 +7,7 @@ import 'package:spring_autumn/Bloc/profile/profile_cubit.dart';
 import 'package:spring_autumn/Bloc/theme_state.dart';
 import 'package:spring_autumn/Pages/about_page.dart';
 import 'package:spring_autumn/Settings/edit_profile_sheet.dart';
+import 'package:spring_autumn/Widgets/color_picker_wheel.dart';
 import 'package:spring_autumn/Widgets/curreny_selecter_tile.dart';
 import 'package:spring_autumn/Widgets/custom_bold_text.dart';
 import 'package:spring_autumn/Widgets/custom_primary_text.dart';
@@ -158,6 +159,24 @@ class SettingsPage extends StatelessWidget {
                 ),
 
                 const Divider(thickness: 0.1),
+
+                ListTile(
+                  leading: const Icon(Iconsax.colorfilter),
+                  title: const CustomPrimaryText(
+                    text: "Accent Color",
+                    size: 15,
+                  ),
+                  trailing: CircleAvatar(
+                    radius: 12,
+                    backgroundColor: context
+                        .watch<ThemeBloc>()
+                        .state
+                        .accentColor,
+                  ),
+                  onTap: () => showColorPicker(context),
+                ),
+                const Divider(thickness: 0.1),
+
                 const CurrencySelectorTile(),
 
                 const Divider(thickness: 0.1),

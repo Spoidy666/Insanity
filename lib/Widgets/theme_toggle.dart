@@ -18,7 +18,7 @@ class ThemeToggle extends StatelessWidget {
         padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
-          color: colorScheme.tertiary,
+          color: Colors.grey.shade500,
         ),
 
         child: Stack(
@@ -31,15 +31,13 @@ class ThemeToggle extends StatelessWidget {
                   Icon(
                     Icons.sunny,
                     size: 18,
-                    color: isDark ? Colors.grey : Colors.white,
+                    color: isDark ? Colors.white : Colors.black,
                   ),
                   SizedBox(width: 24),
                   Icon(
                     Icons.dark_mode,
                     size: 18,
-                    color: isDark
-                        ? Colors.white
-                        : Theme.of(context).colorScheme.secondary,
+                    color: isDark ? Colors.white : Colors.black,
                   ),
                 ],
               ),
@@ -72,7 +70,7 @@ class ThemeToggle extends StatelessWidget {
                     isDark ? Icons.dark_mode_rounded : Icons.wb_sunny,
                     key: ValueKey(isDark),
                     size: 20,
-                    color: isDark ? Colors.grey.shade900 : Colors.white,
+                    color: isDark ? Colors.black : Colors.white,
                   ),
                 ),
               ),

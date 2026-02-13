@@ -16,12 +16,18 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       title: Text(title),
       leading: IconButton(
-        icon: const Icon(Icons.menu_rounded),
+        icon: Icon(
+          Icons.menu_rounded,
+          color: Theme.of(context).colorScheme.tertiary,
+        ),
         onPressed: onMenuTap,
       ),
       actions: [
         IconButton(
-          icon: const Icon(Iconsax.setting_24),
+          icon: Icon(
+            Iconsax.setting_24,
+            color: Theme.of(context).colorScheme.tertiary,
+          ),
           onPressed: () {
             Navigator.of(
               context,

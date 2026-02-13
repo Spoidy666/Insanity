@@ -4,6 +4,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spring_autumn/Theme/theme.dart';
 
+/// =========================
+/// EVENTS
+/// =========================
+
 abstract class ThemeEvent extends Equatable {
   const ThemeEvent();
 
@@ -19,37 +23,90 @@ class EnableDarkMode extends ThemeEvent {}
 
 class EnableLightMode extends ThemeEvent {}
 
+class ToggleAccent extends ThemeEvent {}
 
-
-class ThemeState extends Equatable {
-  final ThemeData themeData;
-
-  const ThemeState(this.themeData);
+class ChangeAccentColor extends ThemeEvent {
+  final Color color;
+  const ChangeAccentColor(this.color);
 
   @override
-  List<Object?> get props => [themeData];
+  List<Object?> get props => [color];
 }
 
+/// =========================
+/// STATE
+/// =========================
+
+class ThemeState extends Equatable {
+  final bool isDark;
+  final Color accentColor;
+  final bool useAccent;
+
+  const ThemeState({
+    required this.isDark,
+    required this.accentColor,
+    required this.useAccent,
+  });
+  ThemeData get themeData {
+    final baseTheme = isDark ? darkmode : lightmode;
+
+    if (!useAccent) return baseTheme;
+
+    return baseTheme.copyWith(
+      colorScheme: baseTheme.colorScheme.copyWith(
+        tertiary: accentColor,
+        secondary: accentColor.withValues(alpha: 0.4),
+      ),
+    );
+  }
+
+  Color complementary(Color color) {
+    final hsl = HSLColor.fromColor(color);
+    final newHue = (hsl.hue + 180) % 360;
+    return hsl.withHue(newHue).toColor();
+  }
+
+  @override
+  List<Object?> get props => [isDark, accentColor, useAccent];
+}
+
+/// =========================
+/// BLOC
+/// =========================
 
 class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
   static const _themeKey = 'isDarkMode';
+  static const _accentKey = 'accentColor';
+  static const _useAccentKey = 'useAccent';
 
-  ThemeBloc() : super( ThemeState(lightmode)) {
+  ThemeBloc()
+    : super(
+        const ThemeState(
+          isDark: false,
+          accentColor: Colors.blue,
+          useAccent: false,
+        ),
+      ) {
     on<LoadTheme>(_onLoadTheme);
     on<ToggleTheme>(_onToggleTheme);
     on<EnableDarkMode>(_onEnableDarkMode);
     on<EnableLightMode>(_onEnableLightMode);
+    on<ToggleAccent>(_onToggleAccent);
+    on<ChangeAccentColor>(_onChangeAccentColor);
 
     add(LoadTheme());
   }
 
-  Future<void> _onLoadTheme(
-    LoadTheme event,
-    Emitter<ThemeState> emit,
-  ) async {
+  Future<void> _onLoadTheme(LoadTheme event, Emitter<ThemeState> emit) async {
     final prefs = await SharedPreferences.getInstance();
-    final isDark = prefs.getBool(_themeKey) ?? false;
-    emit(ThemeState(isDark ? darkmode : lightmode));
+
+    emit(
+      ThemeState(
+        isDark: prefs.getBool(_themeKey) ?? false,
+        accentColor: Color(prefs.getInt(_accentKey) ?? Colors.blue.value),
+        useAccent: prefs.getBool(_useAccentKey) ?? false,
+      ),
+    );
   }
 
   Future<void> _onToggleTheme(
@@ -57,11 +114,18 @@ class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
     Emitter<ThemeState> emit,
   ) async {
     final prefs = await SharedPreferences.getInstance();
-    final isDark = state.themeData.brightness == Brightness.dark;
 
-    final newTheme = isDark ? lightmode : darkmode;
-    emit(ThemeState(newTheme));
-    await prefs.setBool(_themeKey, !isDark);
+    final newIsDark = !state.isDark;
+
+    emit(
+      ThemeState(
+        isDark: newIsDark,
+        accentColor: state.accentColor,
+        useAccent: state.useAccent,
+      ),
+    );
+
+    await prefs.setBool(_themeKey, newIsDark);
   }
 
   Future<void> _onEnableDarkMode(
@@ -69,7 +133,15 @@ class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
     Emitter<ThemeState> emit,
   ) async {
     final prefs = await SharedPreferences.getInstance();
-    emit( ThemeState(darkmode));
+
+    emit(
+      ThemeState(
+        isDark: true,
+        accentColor: state.accentColor,
+        useAccent: state.useAccent,
+      ),
+    );
+
     await prefs.setBool(_themeKey, true);
   }
 
@@ -78,7 +150,52 @@ class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
     Emitter<ThemeState> emit,
   ) async {
     final prefs = await SharedPreferences.getInstance();
-    emit( ThemeState(lightmode));
+
+    emit(
+      ThemeState(
+        isDark: false,
+        accentColor: state.accentColor,
+        useAccent: state.useAccent,
+      ),
+    );
+
     await prefs.setBool(_themeKey, false);
+  }
+
+  Future<void> _onToggleAccent(
+    ToggleAccent event,
+    Emitter<ThemeState> emit,
+  ) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    final newValue = !state.useAccent;
+
+    emit(
+      ThemeState(
+        isDark: state.isDark,
+        accentColor: state.accentColor,
+        useAccent: newValue,
+      ),
+    );
+
+    await prefs.setBool(_useAccentKey, newValue);
+  }
+
+  Future<void> _onChangeAccentColor(
+    ChangeAccentColor event,
+    Emitter<ThemeState> emit,
+  ) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    emit(
+      ThemeState(
+        isDark: state.isDark,
+        accentColor: event.color,
+        useAccent: true,
+      ),
+    );
+
+    await prefs.setInt(_accentKey, event.color.value);
+    await prefs.setBool(_useAccentKey, true);
   }
 }

@@ -32,7 +32,7 @@ class _HomeBalanceContainerState extends State<HomeBalanceContainer>
 
             final formatter = NumberFormat.currency(
               locale: currency.locale,
-              symbol: '',
+              symbol: currency.symbol,
               decimalDigits: currency.decimalDigits,
             );
 
@@ -53,21 +53,13 @@ class _HomeBalanceContainerState extends State<HomeBalanceContainer>
                       size: 17,
                     ),
 
-                    Row(
-                      children: [
-                        Icon(currency.icon, size: 42),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            alignment: Alignment.centerLeft,
-                            child: CustomBoldText(
-                              text: formatter.format(total),
-                              size: 42,
-                            ),
-                          ),
-                        ),
-                      ],
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: CustomBoldText(
+                        text: formatter.format(total),
+                        size: 42,
+                      ),
                     ),
 
                     ClipRect(
@@ -129,13 +121,7 @@ class _HomeBalanceContainerState extends State<HomeBalanceContainer>
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label, style: const TextStyle(fontWeight: FontWeight.w500)),
-          Row(
-            children: [
-              Icon(currency.icon, size: 14),
-              const SizedBox(width: 4),
-              CustomBoldText(text: formatter.format(amount), size: 14),
-            ],
-          ),
+          CustomBoldText(text: formatter.format(amount), size: 14),
         ],
       ),
     );
