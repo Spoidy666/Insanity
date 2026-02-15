@@ -5,6 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:spring_autumn/Bloc/profile/profile_cubit.dart';
 import 'package:spring_autumn/Bloc/theme_state.dart';
+import 'package:spring_autumn/Bloc/transactions/transaction__event.dart';
+import 'package:spring_autumn/Bloc/transactions/transaction_bloc.dart';
+import 'package:spring_autumn/Database/database_helper.dart';
 import 'package:spring_autumn/Pages/about_page.dart';
 import 'package:spring_autumn/Settings/edit_profile_sheet.dart';
 import 'package:spring_autumn/Widgets/color_picker_wheel.dart';
@@ -137,6 +140,7 @@ class SettingsPage extends StatelessWidget {
             _cardContainer(
               context,
               children: [
+                const SizedBox(height: 5),
                 BlocBuilder<ThemeBloc, ThemeState>(
                   builder: (context, state) {
                     final isDark =
@@ -178,7 +182,12 @@ class SettingsPage extends StatelessWidget {
                 const Divider(thickness: 0.1),
 
                 const CurrencySelectorTile(),
-
+                const Divider(thickness: 0.1),
+                UtilityRow(
+                  icon: Iconsax.box_remove,
+                  title: "Delete Category",
+                  onTap: () => _showDeleteCategoryPopup(context),
+                ),
                 const Divider(thickness: 0.1),
                 UtilityRow(
                   icon: Iconsax.import_1,
@@ -203,9 +212,10 @@ class SettingsPage extends StatelessWidget {
                     );
                   },
                 ),
+                const SizedBox(height: 10),
               ],
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
           ],
         ),
       ),
@@ -267,4 +277,123 @@ class UtilityRow extends StatelessWidget {
       onTap: onTap,
     );
   }
+}
+
+void _showDeleteCategoryPopup(BuildContext context) async {
+  final categories = await getAllCategories();
+
+  String? selectedCategoryId;
+
+  showModalBottomSheet(
+    context: context,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+    ),
+    builder: (context) {
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return SafeArea(
+            top: false,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Delete Category?",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+
+                  const SizedBox(height: 8),
+                  CustomPrimaryText(
+                    text:
+                        "All transactions under this category will also be deleted.",
+                    size: 15,
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  DropdownButtonFormField<String>(
+                    value: selectedCategoryId,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      hintText: "Select Category",
+                    ),
+                    items: categories.map((cat) {
+                      return DropdownMenuItem<String>(
+                        value: cat['id'] as String,
+                        child: Text(cat['name'] as String),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedCategoryId = value;
+                      });
+                    },
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.secondary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text(
+                            "Cancel",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(width: 12),
+
+                      Expanded(
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          onPressed: selectedCategoryId == null
+                              ? null
+                              : () async {
+                                  await deleteCategory(selectedCategoryId!);
+
+                                  context.read<TransactionBloc>().add(
+                                    TransactionDeleted(),
+                                  );
+
+                                  Navigator.pop(context);
+                                },
+                          child: const Text(
+                            "Delete",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    },
+  );
 }

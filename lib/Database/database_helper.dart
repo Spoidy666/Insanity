@@ -9,7 +9,7 @@ Future<void> initializeDatabase() async {
 
   _db = await openDatabase(
     path,
-    version: 2,
+    version: 3,
     onConfigure: (db) async {
       await db.execute('PRAGMA foreign_keys = ON');
     },
@@ -27,80 +27,77 @@ Future<void> initializeDatabase() async {
           title TEXT NOT NULL,
           category_id TEXT NOT NULL,
           notes TEXT,
-          amount INTEGER NOT NULL CHECK (amount >= 0),
+          amount REAL NOT NULL CHECK (amount >= 0),
           type TEXT NOT NULL CHECK (type IN ('income', 'expense')),
           method TEXT NOT NULL CHECK (method IN ('upi', 'cash', 'card')),
           transaction_timestamp INTEGER NOT NULL,
           created_at INTEGER NOT NULL,
           FOREIGN KEY (category_id) REFERENCES categories(id)
-            ON DELETE RESTRICT
+            ON DELETE CASCADE
             ON UPDATE CASCADE
         );
       ''');
-      await db.insert('categories', {'id': 'uuid-food', 'name': 'Food'});
 
-      await db.insert('categories', {'id': 'uuid-travel', 'name': 'Travel'});
-
-      await db.insert('categories', {
-        'id': 'uuid-shopping',
-        'name': 'Shopping',
-      });
-
-      await db.insert('categories', {'id': 'uuid-salary', 'name': 'Salary'});
-      await db.execute(
-        'CREATE INDEX idx_transactions_date ON transactions(transaction_timestamp);',
-      );
-
-      await db.execute(
-        'CREATE INDEX idx_transactions_category ON transactions(category_id);',
-      );
+      await _createIndexes(db);
+      await _insertDefaultCategories(db);
     },
+
     onUpgrade: (db, oldVersion, newVersion) async {
-      if (oldVersion < 2) {
+      if (oldVersion < 3) {
         await db.execute('''
-      CREATE TABLE transactions_new (
-        id TEXT PRIMARY KEY,
-        title TEXT NOT NULL,
-        category_id TEXT NOT NULL,
-        notes TEXT,
-        amount REAL NOT NULL CHECK (amount >= 0),
-        type TEXT NOT NULL CHECK (type IN ('income', 'expense')),
-        method TEXT NOT NULL CHECK (method IN ('upi', 'cash', 'card')),
-        transaction_timestamp INTEGER NOT NULL,
-        created_at INTEGER NOT NULL,
-        FOREIGN KEY (category_id) REFERENCES categories(id)
-          ON DELETE RESTRICT
-          ON UPDATE CASCADE
-      );
-    ''');
+          CREATE TABLE transactions_new (
+            id TEXT PRIMARY KEY,
+            title TEXT NOT NULL,
+            category_id TEXT NOT NULL,
+            notes TEXT,
+            amount REAL NOT NULL CHECK (amount >= 0),
+            type TEXT NOT NULL CHECK (type IN ('income', 'expense')),
+            method TEXT NOT NULL CHECK (method IN ('upi', 'cash', 'card')),
+            transaction_timestamp INTEGER NOT NULL,
+            created_at INTEGER NOT NULL,
+            FOREIGN KEY (category_id) REFERENCES categories(id)
+              ON DELETE CASCADE
+              ON UPDATE CASCADE
+          );
+        ''');
 
         await db.execute('''
-      INSERT INTO transactions_new (
-        id, title, category_id, notes, amount,
-        type, method, transaction_timestamp, created_at
-      )
-      SELECT 
-        id, title, category_id, notes, amount,
-        type, method, transaction_timestamp, created_at
-      FROM transactions;
-    ''');
+          INSERT INTO transactions_new (
+            id, title, category_id, notes, amount,
+            type, method, transaction_timestamp, created_at
+          )
+          SELECT 
+            id, title, category_id, notes, amount,
+            type, method, transaction_timestamp, created_at
+          FROM transactions;
+        ''');
 
         await db.execute('DROP TABLE transactions;');
-
         await db.execute(
           'ALTER TABLE transactions_new RENAME TO transactions;',
         );
 
-        await db.execute(
-          'CREATE INDEX idx_transactions_date ON transactions(transaction_timestamp);',
-        );
-
-        await db.execute(
-          'CREATE INDEX idx_transactions_category ON transactions(category_id);',
-        );
+        await _createIndexes(db);
       }
     },
   );
+}
+
+Future<void> _createIndexes(Database db) async {
+  await db.execute(
+    'CREATE INDEX IF NOT EXISTS idx_transactions_date ON transactions(transaction_timestamp);',
+  );
+
+  await db.execute(
+    'CREATE INDEX IF NOT EXISTS idx_transactions_category ON transactions(category_id);',
+  );
+}
+
+Future<void> _insertDefaultCategories(Database db) async {
+  await db.insert('categories', {'id': 'uuid-food', 'name': 'Food'});
+  await db.insert('categories', {'id': 'uuid-travel', 'name': 'Travel'});
+  await db.insert('categories', {'id': 'uuid-shopping', 'name': 'Shopping'});
+  await db.insert('categories', {'id': 'uuid-salary', 'name': 'Salary'});
 }
 
 Future<List<Map<String, Object?>>> getAllTransactions() async {
@@ -215,4 +212,8 @@ Future<List<Map<String, Object?>>> getTransactionsForExport() async {
     LEFT JOIN categories c ON t.category_id = c.id
     ORDER BY t.transaction_timestamp ASC
   ''');
+}
+
+Future<void> deleteCategory(String categoryId) async {
+  await _db.delete('categories', where: 'id = ?', whereArgs: [categoryId]);
 }
