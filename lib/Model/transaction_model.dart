@@ -1,6 +1,18 @@
+import 'package:flutter/material.dart';
+
 enum Type { income, expense }
 
 enum Method { upi, cash, card }
+
+enum DateFilterMode { day, month }
+
+class DateFilter {
+  final DateTime date;
+  final DateFilterMode mode;
+  const DateFilter(this.date, this.mode);
+}
+
+final ValueNotifier<DateFilter?> selectedFilterNotifier = ValueNotifier(null);
 
 class TransactionModel {
   String id;
@@ -38,7 +50,7 @@ class TransactionModel {
     int? transactionTimestamp,
   }) {
     return TransactionModel(
-      id: id, 
+      id: id,
       title: title ?? this.title,
       amount: amount ?? this.amount,
       notes: notes ?? this.notes,
@@ -46,7 +58,7 @@ class TransactionModel {
       method: method ?? this.method,
       categoryId: categoryId ?? this.categoryId,
       transactionTimestamp: transactionTimestamp ?? this.transactionTimestamp,
-      createdAt: createdAt, 
+      createdAt: createdAt,
     );
   }
 }

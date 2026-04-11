@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class CustomFloatingActionButton extends StatelessWidget {
   final VoidCallback onTap;
   final IconData icon;
+
   const CustomFloatingActionButton({
     super.key,
     required this.icon,
@@ -11,19 +12,28 @@ class CustomFloatingActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 65,
-      width: 65,
-      child: FloatingActionButton(
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        enableFeedback: true,
-        elevation: 2,
-        onPressed: onTap,
-        child: Icon(
-          icon,
-          color: Theme.of(context).colorScheme.tertiary,
-          size: 30,
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 65,
+        width: 65,
+
+        decoration: BoxDecoration(
+          color: colorScheme.primary,
+          shape: BoxShape.rectangle,
+
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
+        child: Center(child: Icon(icon, color: colorScheme.tertiary, size: 30)),
       ),
     );
   }

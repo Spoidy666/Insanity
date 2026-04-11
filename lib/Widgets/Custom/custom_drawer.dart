@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
@@ -31,20 +33,38 @@ class CustomDrawer extends StatelessWidget {
               padding: const EdgeInsets.only(top: 50, left: 15),
               child: Column(
                 children: [
-                  Container(
-                    width: double.infinity,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: Colors.blueGrey,
-                    ),
-                    child: const Center(
-                      child: Text(
-                        "Insanity",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                      child: Container(
+                        width: double.infinity,
+                        height: 70,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.tertiary.withValues(alpha: 0.15),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.15),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.15),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: const Center(
+                          child: Text(
+                            "Insanity",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -287,13 +307,9 @@ class DrawerScaffoldState extends State<DrawerScaffold>
                         GestureDetector(
                           onTap: toggleDrawer,
                           child: Container(
-                            color: isDark
-                                ? Colors.grey.shade700.withOpacity(
-                                    0.15 * _animation.value,
-                                  )
-                                : Colors.black.withOpacity(
-                                    0.60 * _animation.value,
-                                  ),
+                            color: Colors.black.withValues(
+                              alpha: 0.60 * _animation.value,
+                            ),
                           ),
                         ),
                     ],

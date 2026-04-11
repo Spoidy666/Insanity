@@ -8,6 +8,7 @@ import 'package:spring_autumn/Bloc/transactions/transaction__event.dart';
 import 'package:spring_autumn/Bloc/transactions/transaction_bloc.dart';
 import 'package:spring_autumn/Database/database_helper.dart';
 import 'package:spring_autumn/Pages/about_page.dart';
+import 'package:spring_autumn/Pages/main_page.dart';
 import 'package:spring_autumn/Settings/edit_profile_sheet.dart';
 import 'package:spring_autumn/Widgets/Custom/custom_snackbar.dart';
 import 'package:spring_autumn/Widgets/color_picker_wheel.dart';
@@ -129,7 +130,7 @@ class SettingsPage extends StatelessWidget {
                         value: profile.email,
                       ),
                       Divider(
-                        thickness: 2,
+                        thickness: 3,
                         color: Theme.of(context).colorScheme.surface,
                       ),
                       _InfoRow(
@@ -173,9 +174,44 @@ class SettingsPage extends StatelessWidget {
                       );
                     },
                   ),
-
                   Divider(
-                    thickness: 2,
+                    thickness: 3,
+                    color: Theme.of(context).colorScheme.surface,
+                  ),
+                  ValueListenableBuilder<bool>(
+                    valueListenable: useGlassNavBar,
+                    builder: (context, isEnabled, _) {
+                      final colorScheme = Theme.of(context).colorScheme;
+
+                      return ListTile(
+                        leading: Icon(
+                          Iconsax.designtools,
+                          color: isEnabled
+                              ? colorScheme.tertiary
+                              : colorScheme.onSurface.withOpacity(0.6),
+                        ),
+
+                        title: const CustomPrimaryText(
+                          text: "Modern Navigation",
+                          size: 15,
+                        ),
+
+                        trailing: Switch(
+                          value: isEnabled,
+                          activeColor: colorScheme.tertiary,
+                          onChanged: (val) {
+                            useGlassNavBar.value = val;
+                          },
+                        ),
+
+                        onTap: () {
+                          useGlassNavBar.value = !isEnabled;
+                        },
+                      );
+                    },
+                  ),
+                  Divider(
+                    thickness: 3,
                     color: Theme.of(context).colorScheme.surface,
                   ),
                   ListTile(
@@ -194,13 +230,13 @@ class SettingsPage extends StatelessWidget {
                     onTap: () => showColorPicker(context),
                   ),
                   Divider(
-                    thickness: 2,
+                    thickness: 3,
                     color: Theme.of(context).colorScheme.surface,
                   ),
 
                   const CurrencySelectorTile(),
                   Divider(
-                    thickness: 2,
+                    thickness: 3,
                     color: Theme.of(context).colorScheme.surface,
                   ),
                   UtilityRow(
@@ -219,7 +255,7 @@ class SettingsPage extends StatelessWidget {
                     },
                   ),
                   Divider(
-                    thickness: 2,
+                    thickness: 3,
                     color: Theme.of(context).colorScheme.surface,
                   ),
                   UtilityRow(
@@ -228,7 +264,7 @@ class SettingsPage extends StatelessWidget {
                     onTap: () => _showDeleteCategoryPopup(context),
                   ),
                   Divider(
-                    thickness: 2,
+                    thickness: 3,
                     color: Theme.of(context).colorScheme.surface,
                   ),
                   UtilityRow(
@@ -237,7 +273,7 @@ class SettingsPage extends StatelessWidget {
                     onTap: () => showImportCsvDialog(context),
                   ),
                   Divider(
-                    thickness: 2,
+                    thickness: 3,
                     color: Theme.of(context).colorScheme.surface,
                   ),
                   UtilityRow(
@@ -246,7 +282,7 @@ class SettingsPage extends StatelessWidget {
                     onTap: () => exportTransactionsToCsv(context),
                   ),
                   Divider(
-                    thickness: 2,
+                    thickness: 3,
                     color: Theme.of(context).colorScheme.surface,
                   ),
 

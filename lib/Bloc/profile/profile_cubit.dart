@@ -35,7 +35,7 @@ class ProfileCubit extends Cubit<ProfileModel> {
         ProfileModel(
           name: "Your Name",
           email: "youremail@gmail.com",
-          phone: "9876543210",
+          phone: "XXXXXXXXXX",
         ),
       ) {
     _load();
@@ -47,7 +47,7 @@ class ProfileCubit extends Cubit<ProfileModel> {
     emit(
       ProfileModel(
         name: prefs.getString('profile_name') ?? "Name",
-        email: prefs.getString('profile_email') ?? "mail@gmail.com",
+        email: prefs.getString('profile_email') ?? "youremail@gmail.com",
         phone: prefs.getString('profile_phone') ?? "XXXXXXXXXX",
         imagePath: prefs.getString('profile_image'),
       ),
