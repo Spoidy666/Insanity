@@ -5,12 +5,14 @@ import 'package:spring_autumn/Bloc/transactions/transaction__event.dart';
 import 'package:spring_autumn/Bloc/transactions/transaction_bloc.dart';
 import 'package:spring_autumn/Database/database_helper.dart';
 import 'package:spring_autumn/Model/transaction_model.dart';
-import 'package:spring_autumn/Widgets/custom_snackbar.dart';
-import 'package:spring_autumn/Widgets/custom_text_field.dart';
+import 'package:spring_autumn/Widgets/Custom/custom_snackbar.dart';
+import 'package:spring_autumn/Widgets/Custom/custom_text_field.dart';
+import 'package:spring_autumn/main.dart';
 import 'package:uuid/uuid.dart';
 
 class AddTransactionSheet extends StatefulWidget {
-  const AddTransactionSheet({super.key});
+  final Type defaultType;
+  const AddTransactionSheet({super.key, this.defaultType = Type.expense});
 
   @override
   State<AddTransactionSheet> createState() => _AddTransactionSheetState();
@@ -21,8 +23,8 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
   final amountController = TextEditingController();
   final notesController = TextEditingController();
 
-  Type selectedType = Type.expense;
-  Method selectedMethod = Method.cash;
+  late Type selectedType;
+  late Method selectedMethod;
 
   String? selectedCategory;
   DateTime selectedDate = DateTime.now();
@@ -32,6 +34,8 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
   @override
   void initState() {
     super.initState();
+    selectedType = widget.defaultType;
+    selectedMethod = defaultMethod;
     _loadCategories();
   }
 
@@ -314,13 +318,21 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
 
                   onPressed: () async {
                     if (titleController.text.trim().isEmpty) {
-                      CustomSnackbar.show(context, message: "Enter the title");
+                      CustomSnackbar.show(
+                        context,
+                        message: "Enter the title",
+                        top: true,
+                      );
 
                       return;
                     }
 
                     if (amountController.text.trim().isEmpty) {
-                      CustomSnackbar.show(context, message: "Enter the amount");
+                      CustomSnackbar.show(
+                        context,
+                        message: "Enter the amount",
+                        top: true,
+                      );
 
                       return;
                     }
@@ -328,6 +340,7 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
                       CustomSnackbar.show(
                         context,
                         message: "Select a Category",
+                        top: true,
                       );
 
                       return;
@@ -338,6 +351,7 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
                       CustomSnackbar.show(
                         context,
                         message: "The Amount should be above 0",
+                        top: true,
                       );
 
                       return;

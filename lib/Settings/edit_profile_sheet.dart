@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:spring_autumn/Bloc/profile/profile_cubit.dart';
-import 'package:spring_autumn/Widgets/custom_text_field.dart';
+import 'package:spring_autumn/Widgets/Custom/custom_button_one.dart';
+import 'package:spring_autumn/Widgets/Custom/custom_snackbar.dart';
+import 'package:spring_autumn/Widgets/Custom/custom_text_field.dart';
 
 class EditProfileSheet extends StatefulWidget {
   const EditProfileSheet({super.key});
@@ -73,40 +77,70 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
               const SizedBox(height: 20),
 
               Center(
-                child: Stack(
-                  alignment: Alignment.bottomRight,
-                  children: [
-                    const CircleAvatar(
-                      radius: 45,
-                      backgroundImage: AssetImage("assets/profile.jpg"),
-                    ),
-                    CircleAvatar(
-                      radius: 16,
-                      backgroundColor: Theme.of(context).colorScheme.secondary,
-                      child: IconButton(
-                        onPressed: () async {
-                          final picker = ImagePicker();
-                          final picked = await picker.pickImage(
-                            source: ImageSource.gallery,
-                          );
+                child: BlocBuilder<ProfileCubit, ProfileModel>(
+                  builder: (context, profile) {
+                    return Center(
+                      child: Stack(
+                        alignment: Alignment.bottomRight,
+                        children: [
+                          CircleAvatar(
+                            radius: 45,
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.secondary.withValues(alpha: 0.25),
+                            backgroundImage: profile.imagePath != null
+                                ? FileImage(File(profile.imagePath!))
+                                : null,
+                            child: profile.imagePath == null
+                                ? Text(
+                                    (profile.name != null &&
+                                            profile.name!.trim().isNotEmpty)
+                                        ? profile.name!.trim()[0].toUpperCase()
+                                        : "?",
+                                    style: TextStyle(
+                                      fontSize: 28,
+                                      fontWeight: FontWeight.bold,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.tertiary,
+                                    ),
+                                  )
+                                : null,
+                          ),
+                          CircleAvatar(
+                            radius: 16,
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.secondary,
+                            child: IconButton(
+                              onPressed: () async {
+                                final picker = ImagePicker();
+                                final picked = await picker.pickImage(
+                                  source: ImageSource.gallery,
+                                );
 
-                          if (picked != null) {
-                            final updated = context
-                                .read<ProfileCubit>()
-                                .state
-                                .copyWith(imagePath: picked.path);
+                                if (picked != null) {
+                                  final updated = context
+                                      .read<ProfileCubit>()
+                                      .state
+                                      .copyWith(imagePath: picked.path);
 
-                            context.read<ProfileCubit>().updateProfile(updated);
-                          }
-                        },
-                        icon: Icon(
-                          Iconsax.camera,
-                          size: 16,
-                          color: Colors.white,
-                        ),
+                                  context.read<ProfileCubit>().updateProfile(
+                                    updated,
+                                  );
+                                }
+                              },
+                              icon: Icon(
+                                Iconsax.camera,
+                                size: 16,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
+                    );
+                  },
                 ),
               ),
 
@@ -139,32 +173,22 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
               SizedBox(
                 height: 45,
                 width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.secondary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  onPressed: () {
+                child: CustomButtonOne(
+                  text: "Save Changes",
+                  onTap: () {
                     final updated = context.read<ProfileCubit>().state.copyWith(
                       name: nameController.text.trim(),
                       email: emailController.text.trim(),
                       phone: phoneController.text.trim(),
                     );
-
                     context.read<ProfileCubit>().updateProfile(updated);
-
                     Navigator.pop(context);
+                    CustomSnackbar.show(
+                      context,
+                      message: "Profile updated successfully",
+                      type: SnackbarType.success,
+                    );
                   },
-                  child: const Text(
-                    'Save Changes',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
                 ),
               ),
 

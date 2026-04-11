@@ -5,8 +5,8 @@ import 'package:spring_autumn/Bloc/transactions/transaction__event.dart';
 import 'package:spring_autumn/Bloc/transactions/transaction_bloc.dart';
 import 'package:spring_autumn/Database/database_helper.dart';
 import 'package:spring_autumn/Model/transaction_model.dart';
-import 'package:spring_autumn/Widgets/custom_snackbar.dart';
-import 'package:spring_autumn/Widgets/custom_text_field.dart';
+import 'package:spring_autumn/Widgets/Custom/custom_snackbar.dart';
+import 'package:spring_autumn/Widgets/Custom/custom_text_field.dart';
 
 class EditTransactionSheet extends StatefulWidget {
   final TransactionModel transaction;

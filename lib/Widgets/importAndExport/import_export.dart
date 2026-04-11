@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:spring_autumn/Database/database_helper.dart';
 import 'package:spring_autumn/Model/transaction_model.dart';
+import 'package:spring_autumn/Widgets/Custom/custom_snackbar.dart';
 import 'package:uuid/uuid.dart';
 
 Future<void> showImportCsvDialog(BuildContext context) async {
@@ -155,11 +156,10 @@ Future<void> importCsvTransactions(BuildContext context) async {
   }
 
   if (context.mounted) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Imported: $imported. Skipped: $skipped'),
-        backgroundColor: imported > 0 ? Colors.green : Colors.red,
-      ),
+    CustomSnackbar.show(
+      context,
+      message: 'Import completed. Imported: $imported. Skipped: $skipped',
+      type: imported > 0 ? SnackbarType.success : SnackbarType.error,
     );
     await getAllTransactions();
   }
@@ -172,9 +172,7 @@ Future<void> exportTransactionsToCsv(BuildContext context) async {
   debugPrint('Rows fetched: ${result.length}');
 
   if (result.isEmpty) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('No transactions to export')));
+    CustomSnackbar.show(context, message: 'No transactions to export');
     return;
   }
 
@@ -220,8 +218,9 @@ Future<void> exportTransactionsToCsv(BuildContext context) async {
     '${directory!.path}/transactions_export_${DateTime.now().millisecondsSinceEpoch}.csv',
   );
   await file.writeAsString(csvString);
-
-  ScaffoldMessenger.of(
+  CustomSnackbar.show(
     context,
-  ).showSnackBar(SnackBar(content: Text('Exported to ${file.path}')));
+    message: 'Exported to ${file.path}',
+    type: SnackbarType.success,
+  );
 }

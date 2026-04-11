@@ -7,7 +7,7 @@ import 'package:spring_autumn/Bloc/transactions/transaction__event.dart';
 import 'package:spring_autumn/Bloc/transactions/transaction_bloc.dart';
 import 'package:spring_autumn/Bloc/transactions/transaction_state.dart';
 import 'package:spring_autumn/Database/database_helper.dart';
-import 'transaction_tile.dart';
+import '../Cards/transaction_tile.dart';
 
 enum TransactionFilter { all, income, expense }
 

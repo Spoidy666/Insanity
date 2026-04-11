@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:spring_autumn/Bloc/currency/currency_cubit.dart';
-import 'package:spring_autumn/Widgets/custom_primary_text.dart';
+import 'package:spring_autumn/Widgets/Custom/custom_primary_text.dart';
+import 'package:spring_autumn/Widgets/Custom/custom_snackbar.dart';
 
 class CurrencySelectorTile extends StatelessWidget {
   const CurrencySelectorTile({super.key});
@@ -23,6 +24,7 @@ class CurrencySelectorTile extends StatelessWidget {
           trailing: Padding(
             padding: const EdgeInsets.only(right: 25),
             child: DropdownButton<AppCurrency>(
+              borderRadius: BorderRadius.circular(10),
               value: selectedCurrency,
               underline: const SizedBox(),
               items: AppCurrency.values.map((currency) {
@@ -34,6 +36,11 @@ class CurrencySelectorTile extends StatelessWidget {
               onChanged: (value) {
                 if (value != null) {
                   context.read<CurrencyCubit>().changeCurrency(value);
+                  CustomSnackbar.show(
+                    context,
+                    message: "Currency changed to ${value.code}",
+                    type: SnackbarType.success,
+                  );
                 }
               },
             ),

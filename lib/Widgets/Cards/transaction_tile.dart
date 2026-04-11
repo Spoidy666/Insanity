@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:spring_autumn/Bloc/currency/currency_cubit.dart';
 import 'package:spring_autumn/Model/transaction_model.dart';
-import 'package:spring_autumn/Widgets/custom_bold_text.dart';
-import 'package:spring_autumn/Widgets/transaction_details_dialog.dart';
+import 'package:spring_autumn/Widgets/Custom/custom_bold_text.dart';
+import 'package:spring_autumn/Widgets/Transaction/transaction_details_dialog.dart';
 
 class TransactionTile extends StatelessWidget {
   final Map<String, Object?> transaction;

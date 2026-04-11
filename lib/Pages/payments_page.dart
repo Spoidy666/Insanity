@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:spring_autumn/Widgets/add_transaction_sheet.dart';
-import 'package:spring_autumn/Widgets/bar_graph.dart';
-import 'package:spring_autumn/Widgets/custom_bold_text.dart';
-import 'package:spring_autumn/Widgets/custom_floating_action_button.dart';
-import 'package:spring_autumn/Widgets/piechart.dart';
-import 'package:spring_autumn/Widgets/recent_transactions.dart';
+import 'package:spring_autumn/Widgets/Transaction/add_transaction_sheet.dart';
+import 'package:spring_autumn/Widgets/Graphs/bar_graph.dart';
+import 'package:spring_autumn/Widgets/Custom/custom_bold_text.dart';
+import 'package:spring_autumn/Widgets/Custom/custom_floating_action_button.dart';
+import 'package:spring_autumn/Widgets/Graphs/piechart.dart';
+import 'package:spring_autumn/Widgets/Transaction/recent_transactions.dart';
 import 'package:spring_autumn/Model/transaction_model.dart';
 
 final ValueNotifier<DateTime?> selectedMonthNotifier = ValueNotifier<DateTime?>(

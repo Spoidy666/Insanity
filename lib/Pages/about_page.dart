@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:spring_autumn/Widgets/custom_bold_text.dart';
-import 'package:spring_autumn/Widgets/custom_primary_text.dart';
+import 'package:spring_autumn/Widgets/Custom/custom_bold_text.dart';
+import 'package:spring_autumn/Widgets/Custom/custom_primary_text.dart';
 
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:spring_autumn/Widgets/bar_graph.dart';
-import 'package:spring_autumn/Widgets/line_chart.dart';
+import 'package:spring_autumn/Widgets/Graphs/bar_graph.dart';
+import 'package:spring_autumn/Widgets/Graphs/line_chart.dart';
 import 'package:spring_autumn/Widgets/modern_type_tab.dart';
-import 'package:spring_autumn/Widgets/piechart.dart';
+import 'package:spring_autumn/Widgets/Graphs/piechart.dart';
 import 'package:spring_autumn/Model/transaction_model.dart';
 
 class VisualRepresentationPage extends StatefulWidget {

@@ -4,8 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:spring_autumn/Bloc/currency/currency_cubit.dart';
 import 'package:spring_autumn/Bloc/transactions/transaction_bloc.dart';
 import 'package:spring_autumn/Bloc/transactions/transaction_state.dart';
-import 'package:spring_autumn/Widgets/custom_bold_text.dart';
-import 'package:spring_autumn/Widgets/custom_primary_text.dart';
+import 'package:spring_autumn/Widgets/Custom/custom_bold_text.dart';
+import 'package:spring_autumn/Widgets/Custom/custom_primary_text.dart';
 
 class HomeBalanceContainer extends StatefulWidget {
   const HomeBalanceContainer({super.key});

@@ -18,7 +18,7 @@ class DrawerThemeToggle extends StatelessWidget {
         padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
-          color: Colors.grey,
+          color: isDark ? Colors.grey.shade700 : Colors.grey.shade400,
         ),
 
         child: Stack(

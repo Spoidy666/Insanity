@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:spring_autumn/Bloc/currency/currency_cubit.dart';
 import 'package:spring_autumn/Model/transaction_model.dart';
-import 'package:spring_autumn/Widgets/edit_transaction_sheet.dart';
+import 'package:spring_autumn/Widgets/Transaction/edit_transaction_sheet.dart';
 
 void showTransactionDetailsDialog(
   BuildContext context, {
