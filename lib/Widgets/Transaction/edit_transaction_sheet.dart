@@ -5,6 +5,7 @@ import 'package:spring_autumn/Bloc/transactions/transaction__event.dart';
 import 'package:spring_autumn/Bloc/transactions/transaction_bloc.dart';
 import 'package:spring_autumn/Database/database_helper.dart';
 import 'package:spring_autumn/Model/transaction_model.dart';
+import 'package:spring_autumn/Widgets/Custom/custom_button_one.dart';
 import 'package:spring_autumn/Widgets/Custom/custom_snackbar.dart';
 import 'package:spring_autumn/Widgets/Custom/custom_text_field.dart';
 
@@ -251,18 +252,9 @@ class _EditTransactionSheetState extends State<EditTransactionSheet> {
               SizedBox(
                 width: double.infinity,
                 height: 45,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.secondary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  onPressed: _saveChanges,
-                  child: const Text(
-                    'Update Transaction',
-                    style: TextStyle(color: Colors.white),
-                  ),
+                child: CustomButtonOne(
+                  text: "Update Transaction",
+                  onTap: _saveChanges,
                 ),
               ),
 

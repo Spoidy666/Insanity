@@ -2,25 +2,20 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:spring_autumn/Theme/glass.dart';
 
-enum ButtonType { normal, danger }
-
-class CustomButtonOne extends StatelessWidget {
+class CustomIconButtonOne extends StatelessWidget {
   final VoidCallback onTap;
-  final String text;
-  final ButtonType type;
-  const CustomButtonOne({
+  final IconData icon;
+
+  const CustomIconButtonOne({
     super.key,
-    required this.text,
+    required this.icon,
     required this.onTap,
-    this.type = ButtonType.normal,
   });
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final baseColor = type == ButtonType.danger
-        ? Colors.red
-        : colorScheme.secondary;
+    final scheme = Theme.of(context).colorScheme;
+
     return ValueListenableBuilder<GlassConfig>(
       valueListenable: glassConfig,
       builder: (context, config, _) {
@@ -29,58 +24,41 @@ class CustomButtonOne extends StatelessWidget {
         if (!isGlass) {
           return ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: baseColor,
+              backgroundColor: scheme.primary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
               ),
+              padding: const EdgeInsets.symmetric(vertical: 12),
             ),
             onPressed: onTap,
-            child: Text(
-              text,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+            child: Icon(icon, size: 25, color: scheme.tertiary),
           );
         }
-
         return ClipRRect(
           borderRadius: BorderRadius.circular(20),
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
             child: InkWell(
-              splashColor: Colors.transparent,
-              highlightColor: Colors.transparent,
-              hoverColor: Colors.transparent,
               onTap: onTap,
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
                   gradient: LinearGradient(
                     colors: [
-                      baseColor.withValues(alpha: 0.25),
-                      baseColor.withValues(alpha: 0.1),
+                      Colors.white.withValues(alpha: 0.08),
+                      Colors.white.withValues(alpha: 0.03),
                     ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
-                  border: Border.all(color: baseColor.withValues(alpha: 0.5)),
+                  border: Border.all(
+                    color: scheme.tertiary.withValues(alpha: 0.2),
+                  ),
                 ),
                 child: Center(
-                  child: Text(
-                    text,
-                    style: TextStyle(
-                      color: colorScheme.tertiary,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+                  child: Icon(icon, size: 25, color: scheme.tertiary),
                 ),
               ),
             ),

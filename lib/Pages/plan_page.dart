@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:spring_autumn/Model/goal_modal.dart';
 
 class PlanPage extends StatelessWidget {
   const PlanPage({super.key});

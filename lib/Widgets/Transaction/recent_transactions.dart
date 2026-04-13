@@ -3,23 +3,44 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:intl/intl.dart';
+import 'package:spring_autumn/Bloc/currency/currency_cubit.dart';
 import 'package:spring_autumn/Bloc/transactions/transaction__event.dart';
 import 'package:spring_autumn/Bloc/transactions/transaction_bloc.dart';
 import 'package:spring_autumn/Bloc/transactions/transaction_state.dart';
 import 'package:spring_autumn/Database/database_helper.dart';
+import 'package:spring_autumn/Model/transaction_model.dart';
 import '../Cards/transaction_tile.dart';
 
 enum TransactionFilter { all, income, expense }
 
 class RecentTransactions extends StatelessWidget {
   final TransactionFilter filter;
-  final DateTime? month;
+  final DateFilter? dateFilter;
 
   const RecentTransactions({
     super.key,
     required this.filter,
-    required this.month,
+    required this.dateFilter,
   });
+
+  Map<String, double> _buildMonthTotals(
+    List<Map<String, Object?>> transactions,
+  ) {
+    final Map<String, double> totals = {};
+
+    for (final tx in transactions) {
+      final timestamp = tx['transaction_timestamp'] as int;
+      final amount = (tx['amount'] as num).toDouble();
+      final type = tx['type'] as String;
+      final label = _monthLabel(timestamp);
+
+      final signed = type == 'income' ? amount : -amount;
+      totals[label] = (totals[label] ?? 0) + signed;
+    }
+
+    return totals;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +56,6 @@ class RecentTransactions extends StatelessWidget {
           final filteredTransactions =
               state.transactions.where((tx) {
                 final type = tx['type'] as String;
-
                 switch (filter) {
                   case TransactionFilter.income:
                     if (type != 'income') return false;
@@ -47,14 +67,22 @@ class RecentTransactions extends StatelessWidget {
                     break;
                 }
 
-                if (month != null) {
+                if (dateFilter != null) {
                   final txDate = DateTime.fromMillisecondsSinceEpoch(
                     tx['transaction_timestamp'] as int,
                   );
 
-                  if (txDate.year != month!.year ||
-                      txDate.month != month!.month) {
-                    return false;
+                  if (dateFilter!.mode == DateFilterMode.month) {
+                    if (txDate.year != dateFilter!.date.year ||
+                        txDate.month != dateFilter!.date.month) {
+                      return false;
+                    }
+                  } else {
+                    if (txDate.year != dateFilter!.date.year ||
+                        txDate.month != dateFilter!.date.month ||
+                        txDate.day != dateFilter!.date.day) {
+                      return false;
+                    }
                   }
                 }
 
@@ -71,57 +99,88 @@ class RecentTransactions extends StatelessWidget {
             );
           }
 
-          return AnimationLimiter(
-            child: SliverList(
-              delegate: SliverChildBuilderDelegate((context, index) {
-                final tx = filteredTransactions[index];
+          final monthTotals = _buildMonthTotals(filteredTransactions);
 
-                final timestamp = tx['transaction_timestamp'] as int;
-                final categoryId = tx['category_id'] as String;
-                final categoryName = state.categoryMap[categoryId] ?? "Unknown";
+          return BlocBuilder<CurrencyCubit, AppCurrency>(
+            builder: (context, currency) {
+              return AnimationLimiter(
+                child: SliverList(
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final tx = filteredTransactions[index];
 
-                final currentMonth = _monthLabel(timestamp);
-                final previousMonth = index == 0
-                    ? null
-                    : _monthLabel(
-                        filteredTransactions[index - 1]['transaction_timestamp']
-                            as int,
-                      );
+                    final timestamp = tx['transaction_timestamp'] as int;
+                    final categoryId = tx['category_id'] as String;
+                    final categoryName =
+                        state.categoryMap[categoryId] ?? "Unknown";
 
-                final showHeader = currentMonth != previousMonth;
+                    final currentMonth = _monthLabel(timestamp);
+                    final previousMonth = index == 0
+                        ? null
+                        : _monthLabel(
+                            filteredTransactions[index -
+                                    1]['transaction_timestamp']
+                                as int,
+                          );
 
-                return AnimationConfiguration.staggeredList(
-                  position: index,
-                  duration: const Duration(milliseconds: 220),
-                  child: SlideAnimation(
-                    verticalOffset: 20,
-                    child: FadeInAnimation(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (showHeader)
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(12, 16, 16, 8),
-                              child: Text(
-                                currentMonth,
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.grey,
+                    final showHeader = currentMonth != previousMonth;
+                    final monthTotal = monthTotals[currentMonth] ?? 0;
+                    final isPositive = monthTotal >= 0;
+
+                    return AnimationConfiguration.staggeredList(
+                      position: index,
+                      duration: const Duration(milliseconds: 220),
+                      child: SlideAnimation(
+                        verticalOffset: 20,
+                        child: FadeInAnimation(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (showHeader)
+                                Padding(
+                                  padding: const EdgeInsets.fromLTRB(
+                                    12,
+                                    16,
+                                    16,
+                                    8,
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        currentMonth,
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                      Text(
+                                        "${isPositive ? '+' : ''}${NumberFormat.currency(locale: currency.locale, symbol: currency.symbol, decimalDigits: currency.decimalDigits).format(monthTotal)}",
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w600,
+                                          color: isPositive
+                                              ? Colors.green
+                                              : Colors.red,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
+                              TransactionSlidableTile(
+                                tx: tx,
+                                categoryName: categoryName,
                               ),
-                            ),
-                          TransactionSlidableTile(
-                            tx: tx,
-                            categoryName: categoryName,
+                            ],
                           ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
-                );
-              }, childCount: filteredTransactions.length),
-            ),
+                    );
+                  }, childCount: filteredTransactions.length),
+                ),
+              );
+            },
           );
         }
 
@@ -177,7 +236,6 @@ class _TransactionSlidableTileState extends State<TransactionSlidableTile>
   @override
   void initState() {
     super.initState();
-
     _controller = SlidableController(this);
     _controller.animation.addListener(_handleSlide);
   }
@@ -185,7 +243,6 @@ class _TransactionSlidableTileState extends State<TransactionSlidableTile>
   void _handleSlide() {
     if (_controller.animation.value >= 0.4 && !_popupShown) {
       _popupShown = true;
-
       _showActionPopup(context, widget.tx);
       _controller.close();
     }
@@ -202,10 +259,8 @@ class _TransactionSlidableTileState extends State<TransactionSlidableTile>
   Widget build(BuildContext context) {
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
-
       child: Slidable(
         key: ValueKey(widget.tx['id']),
-
         controller: _controller,
         endActionPane: ActionPane(
           motion: const StretchMotion(),
@@ -220,7 +275,6 @@ class _TransactionSlidableTileState extends State<TransactionSlidableTile>
             ),
           ],
         ),
-
         child: TransactionTile(
           transaction: widget.tx,
           categoryName: widget.categoryName,
@@ -248,7 +302,6 @@ class _TransactionSlidableTileState extends State<TransactionSlidableTile>
                   "Delete Transaction?",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-
                 const SizedBox(height: 8),
                 Text(
                   "This action cannot be undone.",
@@ -256,9 +309,7 @@ class _TransactionSlidableTileState extends State<TransactionSlidableTile>
                     color: Theme.of(context).colorScheme.secondary,
                   ),
                 ),
-
                 const SizedBox(height: 20),
-
                 Row(
                   children: [
                     Expanded(
@@ -271,18 +322,14 @@ class _TransactionSlidableTileState extends State<TransactionSlidableTile>
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
+                        onPressed: () => Navigator.pop(context),
                         child: const Text(
                           "Cancel",
                           style: TextStyle(color: Colors.white),
                         ),
                       ),
                     ),
-
                     const SizedBox(width: 12),
-
                     Expanded(
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
@@ -296,7 +343,6 @@ class _TransactionSlidableTileState extends State<TransactionSlidableTile>
                           context.read<TransactionBloc>().add(
                             TransactionDeleted(),
                           );
-
                           Navigator.pop(context);
                         },
                         child: const Text(

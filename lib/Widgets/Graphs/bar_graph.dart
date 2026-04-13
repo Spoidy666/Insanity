@@ -7,11 +7,12 @@ import 'package:spring_autumn/Model/transaction_model.dart';
 
 class ExpenseBarChartCard extends StatelessWidget {
   final Type type;
-  final DateTime? month;
+  final DateFilter? dateFilter;
+
   const ExpenseBarChartCard({
     super.key,
     required this.type,
-    required this.month,
+    required this.dateFilter,
   });
 
   Map<String, double> _buildExpenseData(
@@ -22,13 +23,23 @@ class ExpenseBarChartCard extends StatelessWidget {
 
     for (final tx in transactions) {
       if (tx['type'] != type.name) continue;
-      final txDate = DateTime.fromMillisecondsSinceEpoch(
-        tx['transaction_timestamp'] as int,
-      );
 
-      if (month != null) {
-        if (txDate.year != month!.year || txDate.month != month!.month) {
-          continue;
+      if (dateFilter != null) {
+        final txDate = DateTime.fromMillisecondsSinceEpoch(
+          tx['transaction_timestamp'] as int,
+        );
+
+        if (dateFilter!.mode == DateFilterMode.month) {
+          if (txDate.year != dateFilter!.date.year ||
+              txDate.month != dateFilter!.date.month) {
+            continue;
+          }
+        } else {
+          if (txDate.year != dateFilter!.date.year ||
+              txDate.month != dateFilter!.date.month ||
+              txDate.day != dateFilter!.date.day) {
+            continue;
+          }
         }
       }
 
@@ -77,7 +88,6 @@ class ExpenseBarChartCard extends StatelessWidget {
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
               const SizedBox(height: 16),
-
               SizedBox(
                 height: 260,
                 child: BarChart(
@@ -120,7 +130,6 @@ class ExpenseBarChartCard extends StatelessWidget {
                     barGroups: List.generate(keys.length, (i) {
                       final value = data[keys[i]]!;
                       final color = _generateColor(i, keys.length);
-
                       return BarChartGroupData(
                         x: i,
                         barRods: [

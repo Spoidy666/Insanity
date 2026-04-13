@@ -9,15 +9,15 @@ import 'package:spring_autumn/Bloc/transactions/transaction_bloc.dart';
 import 'package:spring_autumn/Database/database_helper.dart';
 import 'package:spring_autumn/Model/transaction_model.dart';
 import 'package:spring_autumn/Pages/main_page.dart';
+import 'package:spring_autumn/Theme/glass.dart';
 
 late Method defaultMethod;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  await loadGlassConfig();
   await initializeDatabase();
   final prefs = await SharedPreferences.getInstance();
   final value = prefs.getString('default_method');
-
   defaultMethod = Method.values.firstWhere(
     (e) => e.name == value,
     orElse: () => Method.cash,

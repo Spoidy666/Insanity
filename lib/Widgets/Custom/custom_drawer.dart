@@ -6,6 +6,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:spring_autumn/Bloc/theme_state.dart';
 import 'package:spring_autumn/Pages/visual_representation_page.dart';
 import 'package:spring_autumn/Settings/settings_page.dart';
+import 'package:spring_autumn/Widgets/Custom/custom_icon_button_one.dart';
 import 'package:spring_autumn/Widgets/drawer_button.dart';
 import 'package:spring_autumn/Widgets/drawer_theme_toggle.dart';
 import 'package:spring_autumn/Widgets/importAndExport/import_export.dart';
@@ -133,6 +134,13 @@ class CustomDrawer extends StatelessWidget {
                             i: Iconsax.import_1,
                           ),
                           const SizedBox(height: 10),
+                          CustomDrawerButton(
+                            name: "Export",
+                            onTap: () => exportTransactionsToCsv(context),
+                            isActive: false,
+                            i: Iconsax.export_1,
+                          ),
+                          const SizedBox(height: 10),
                         ],
                       ),
                     ),
@@ -154,25 +162,15 @@ class CustomDrawer extends StatelessWidget {
 
                   SizedBox(
                     width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      onPressed: () {
+                    child: CustomIconButtonOne(
+                      icon: Iconsax.setting_24,
+                      onTap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (_) => const SettingsPage(),
                           ),
                         );
                       },
-                      child: Icon(
-                        Iconsax.setting_24,
-                        size: 25,
-                        color: Theme.of(context).colorScheme.tertiary,
-                      ),
                     ),
                   ),
 
@@ -264,10 +262,6 @@ class DrawerScaffoldState extends State<DrawerScaffold>
 
   @override
   Widget build(BuildContext context) {
-    final isDark =
-        context.watch<ThemeBloc>().state.themeData.brightness ==
-        Brightness.dark;
-
     return GestureDetector(
       onHorizontalDragUpdate: _onDragUpdate,
       onHorizontalDragEnd: _onDragEnd,

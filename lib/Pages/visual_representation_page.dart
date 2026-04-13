@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:spring_autumn/Widgets/Graphs/bar_graph.dart';
-import 'package:spring_autumn/Widgets/Graphs/line_chart.dart';
 import 'package:spring_autumn/Widgets/modern_type_tab.dart';
 import 'package:spring_autumn/Widgets/Graphs/piechart.dart';
 import 'package:spring_autumn/Model/transaction_model.dart';
@@ -18,7 +17,7 @@ class _VisualRepresentationPageState extends State<VisualRepresentationPage> {
   Type selectedType = Type.expense;
   late final PageController _pageController;
 
-  DateTime? selectedMonth;
+  DateFilter? selectedFilter;
 
   @override
   void initState() {
@@ -62,10 +61,13 @@ class _VisualRepresentationPageState extends State<VisualRepresentationPage> {
             const SizedBox(height: 8),
 
             TextButton.icon(
+              onLongPress: () {
+                setState(() => selectedFilter = null);
+              },
               onPressed: () async {
                 final picked = await showDatePicker(
                   context: context,
-                  initialDate: selectedMonth ?? DateTime.now(),
+                  initialDate: selectedFilter?.date ?? DateTime.now(),
                   firstDate: DateTime(2000),
                   lastDate: DateTime.now(),
                   initialDatePickerMode: DatePickerMode.day,
@@ -85,23 +87,69 @@ class _VisualRepresentationPageState extends State<VisualRepresentationPage> {
                   },
                 );
 
-                if (picked != null) {
-                  setState(() {
-                    selectedMonth = DateTime(picked.year, picked.month);
-                  });
+                if (picked != null && context.mounted) {
+                  final mode = await showModalBottomSheet<DateFilterMode>(
+                    context: context,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(16),
+                      ),
+                    ),
+                    builder: (ctx) => SafeArea(
+                      top: false,
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Filter by",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            ListTile(
+                              leading: const Icon(Iconsax.calendar_1),
+                              title: Text(
+                                "This day  (${picked.day}/${picked.month}/${picked.year})",
+                              ),
+                              onTap: () =>
+                                  Navigator.pop(ctx, DateFilterMode.day),
+                            ),
+                            ListTile(
+                              leading: const Icon(Iconsax.calendar),
+                              title: Text(
+                                "This month  (${picked.month}/${picked.year})",
+                              ),
+                              onTap: () =>
+                                  Navigator.pop(ctx, DateFilterMode.month),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+
+                  if (mode != null) {
+                    setState(() {
+                      selectedFilter = DateFilter(picked, mode);
+                    });
+                  }
                 }
-              },
-              onLongPress: () {
-                setState(() => selectedMonth = null);
               },
               icon: Icon(
                 Iconsax.calendar_edit,
                 color: Theme.of(context).colorScheme.tertiary,
               ),
               label: Text(
-                selectedMonth == null
+                selectedFilter == null
                     ? "All time"
-                    : "${selectedMonth!.month}/${selectedMonth!.year}",
+                    : selectedFilter!.mode == DateFilterMode.day
+                    ? "${selectedFilter!.date.day}/${selectedFilter!.date.month}/${selectedFilter!.date.year}"
+                    : "${selectedFilter!.date.month}/${selectedFilter!.date.year}",
                 style: TextStyle(color: Theme.of(context).colorScheme.tertiary),
               ),
             ),
@@ -114,8 +162,8 @@ class _VisualRepresentationPageState extends State<VisualRepresentationPage> {
                   setState(() => selectedType = Type.values[index]);
                 },
                 children: [
-                  ChartsSection(type: Type.income, month: selectedMonth),
-                  ChartsSection(type: Type.expense, month: selectedMonth),
+                  ChartsSection(type: Type.income, dateFilter: selectedFilter),
+                  ChartsSection(type: Type.expense, dateFilter: selectedFilter),
                 ],
               ),
             ),
@@ -128,9 +176,13 @@ class _VisualRepresentationPageState extends State<VisualRepresentationPage> {
 
 class ChartsSection extends StatelessWidget {
   final Type type;
-  final DateTime? month;
+  final DateFilter? dateFilter;
 
-  const ChartsSection({super.key, required this.type, required this.month});
+  const ChartsSection({
+    super.key,
+    required this.type,
+    required this.dateFilter,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -151,18 +203,18 @@ class ChartsSection extends StatelessWidget {
         );
       },
       child: SingleChildScrollView(
-        physics: BouncingScrollPhysics(),
+        physics: const BouncingScrollPhysics(),
         key: ValueKey(
-          '${type.name}-${month?.month ?? "all"}-${month?.year ?? ""}',
+          '${type.name}-${dateFilter?.mode.name ?? "all"}-${dateFilter?.date.day ?? ""}-${dateFilter?.date.month ?? ""}-${dateFilter?.date.year ?? ""}',
         ),
         child: Column(
           children: [
-            ExpensePieChartCard(type: type, month: month),
+            ExpensePieChartCard(type: type, dateFilter: dateFilter),
             const SizedBox(height: 40),
-            ExpenseBarChartCard(type: type, month: month),
+            ExpenseBarChartCard(type: type, dateFilter: dateFilter),
             const SizedBox(height: 40),
-            ExpenseLineChartCard(type: type, month: month),
-            const SizedBox(height: 40),
+            // ExpenseLineChartCard(type: type, dateFilter: dateFilter),
+            // const SizedBox(height: 40),
           ],
         ),
       ),

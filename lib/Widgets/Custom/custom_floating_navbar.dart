@@ -22,7 +22,7 @@ class FloatingGlassNavBar extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+          filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
           child: Container(
             height: 65,
             decoration: BoxDecoration(

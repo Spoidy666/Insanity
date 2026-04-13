@@ -8,8 +8,9 @@ import 'package:spring_autumn/Bloc/transactions/transaction__event.dart';
 import 'package:spring_autumn/Bloc/transactions/transaction_bloc.dart';
 import 'package:spring_autumn/Database/database_helper.dart';
 import 'package:spring_autumn/Pages/about_page.dart';
-import 'package:spring_autumn/Pages/main_page.dart';
 import 'package:spring_autumn/Settings/edit_profile_sheet.dart';
+import 'package:spring_autumn/Settings/glass_settings.dart';
+import 'package:spring_autumn/Widgets/Custom/custom_button_one.dart';
 import 'package:spring_autumn/Widgets/Custom/custom_snackbar.dart';
 import 'package:spring_autumn/Widgets/color_picker_wheel.dart';
 import 'package:spring_autumn/Widgets/curreny_selecter_tile.dart';
@@ -35,7 +36,7 @@ class SettingsPage extends StatelessWidget {
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
           leading: IconButton(
-            icon: Icon(Iconsax.arrow_left_1),
+            icon: Icon(Iconsax.arrow_left_2),
             onPressed: () {
               Navigator.of(context).pop();
             },
@@ -79,12 +80,30 @@ class SettingsPage extends StatelessWidget {
                         ),
 
                         const SizedBox(height: 15),
-                        Text(
-                          profile.name,
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
+                        InkWell(
+                          splashColor: Colors.transparent,
+                          highlightColor: Colors.transparent,
+                          hoverColor: Colors.transparent,
+
+                          child: Text(
+                            profile.name,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
+                          onTap: () {
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(16),
+                                ),
+                              ),
+                              builder: (_) => const EditProfileSheet(),
+                            );
+                          },
                         ),
                         const SizedBox(height: 5),
                       ],
@@ -178,35 +197,15 @@ class SettingsPage extends StatelessWidget {
                     thickness: 3,
                     color: Theme.of(context).colorScheme.surface,
                   ),
-                  ValueListenableBuilder<bool>(
-                    valueListenable: useGlassNavBar,
-                    builder: (context, isEnabled, _) {
-                      final colorScheme = Theme.of(context).colorScheme;
-
-                      return ListTile(
-                        leading: Icon(
-                          Iconsax.designtools,
-                          color: isEnabled
-                              ? colorScheme.tertiary
-                              : colorScheme.onSurface.withOpacity(0.6),
+                  UtilityRow(
+                    icon: Iconsax.designtools,
+                    title: "Glass Theme",
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const GlassSettingsPage(),
                         ),
-
-                        title: const CustomPrimaryText(
-                          text: "Modern Navigation",
-                          size: 15,
-                        ),
-
-                        trailing: Switch(
-                          value: isEnabled,
-                          activeColor: colorScheme.tertiary,
-                          onChanged: (val) {
-                            useGlassNavBar.value = val;
-                          },
-                        ),
-
-                        onTap: () {
-                          useGlassNavBar.value = !isEnabled;
-                        },
                       );
                     },
                   ),
@@ -214,20 +213,27 @@ class SettingsPage extends StatelessWidget {
                     thickness: 3,
                     color: Theme.of(context).colorScheme.surface,
                   ),
-                  ListTile(
-                    leading: const Icon(Iconsax.colorfilter),
-                    title: const CustomPrimaryText(
-                      text: "Accent Color",
-                      size: 15,
+                  Theme(
+                    data: Theme.of(context).copyWith(
+                      splashColor: Colors.transparent,
+                      highlightColor: Colors.transparent,
+                      hoverColor: Colors.transparent,
                     ),
-                    trailing: CircleAvatar(
-                      radius: 12,
-                      backgroundColor: context
-                          .watch<ThemeBloc>()
-                          .state
-                          .accentColor,
+                    child: ListTile(
+                      leading: const Icon(Iconsax.colorfilter),
+                      title: const CustomPrimaryText(
+                        text: "Accent Color",
+                        size: 15,
+                      ),
+                      trailing: CircleAvatar(
+                        radius: 12,
+                        backgroundColor: context
+                            .watch<ThemeBloc>()
+                            .state
+                            .accentColor,
+                      ),
+                      onTap: () => showColorPicker(context),
                     ),
-                    onTap: () => showColorPicker(context),
                   ),
                   Divider(
                     thickness: 3,
@@ -433,37 +439,28 @@ void _showDeleteCategoryPopup(BuildContext context) async {
                   Row(
                     children: [
                       Expanded(
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Theme.of(
-                              context,
-                            ).colorScheme.secondary,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          onPressed: () {
+                        child: CustomButtonOne(
+                          text: "Cancel",
+                          onTap: () {
                             Navigator.pop(context);
                           },
-                          child: const Text(
-                            "Cancel",
-                            style: TextStyle(color: Colors.white),
-                          ),
                         ),
                       ),
 
                       const SizedBox(width: 12),
-
                       Expanded(
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          onPressed: selectedCategoryId == null
-                              ? null
+                        child: CustomButtonOne(
+                          text: "Delete",
+                          type: ButtonType.danger,
+                          onTap: selectedCategoryId == null
+                              ? () {
+                                  CustomSnackbar.show(
+                                    context,
+                                    message:
+                                        "Please select a category to delete",
+                                    top: true,
+                                  );
+                                }
                               : () async {
                                   await deleteCategory(selectedCategoryId!);
 
@@ -478,10 +475,6 @@ void _showDeleteCategoryPopup(BuildContext context) async {
                                     type: SnackbarType.success,
                                   );
                                 },
-                          child: const Text(
-                            "Delete",
-                            style: TextStyle(color: Colors.white),
-                          ),
                         ),
                       ),
                     ],

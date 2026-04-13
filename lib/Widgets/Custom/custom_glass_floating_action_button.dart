@@ -18,7 +18,7 @@ class GlassFloatingActionButton extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
         child: GestureDetector(
           onTap: onTap,
           child: Container(

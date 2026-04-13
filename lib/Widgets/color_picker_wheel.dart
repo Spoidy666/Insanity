@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:spring_autumn/Bloc/theme_state.dart';
+import 'package:spring_autumn/Widgets/Custom/custom_button_one.dart';
 
 void showColorPicker(BuildContext context) {
   final themeBloc = context.read<ThemeBloc>();
@@ -68,14 +69,9 @@ void showColorPicker(BuildContext context) {
             actions: [
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  onPressed: () {
+                child: CustomButtonOne(
+                  text: "Apply",
+                  onTap: () {
                     if (tempUseAccent) {
                       themeBloc.add(ChangeAccentColor(tempColor));
                     } else {
@@ -84,21 +80,15 @@ void showColorPicker(BuildContext context) {
 
                     Navigator.pop(context);
                   },
-                  child: Text("Apply", style: TextStyle(color: Colors.white)),
                 ),
               ),
+              const SizedBox(height: 5),
 
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  onPressed: () => Navigator.pop(context),
-                  child: Text("Close", style: TextStyle(color: Colors.white)),
+                child: CustomButtonOne(
+                  text: "Close",
+                  onTap: () => Navigator.pop(context),
                 ),
               ),
             ],

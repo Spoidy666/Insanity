@@ -17,17 +17,17 @@ class CustomFloatingActionButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 65,
-        width: 65,
+        height: 60,
+        width: 60,
 
         decoration: BoxDecoration(
-          color: colorScheme.primary,
+          color: colorScheme.surface,
           shape: BoxShape.rectangle,
 
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(15),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withValues(alpha: 0.2),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),

@@ -5,6 +5,7 @@ import 'package:spring_autumn/Bloc/transactions/transaction__event.dart';
 import 'package:spring_autumn/Bloc/transactions/transaction_bloc.dart';
 import 'package:spring_autumn/Database/database_helper.dart';
 import 'package:spring_autumn/Model/transaction_model.dart';
+import 'package:spring_autumn/Widgets/Custom/custom_button_one.dart';
 import 'package:spring_autumn/Widgets/Custom/custom_snackbar.dart';
 import 'package:spring_autumn/Widgets/Custom/custom_text_field.dart';
 import 'package:spring_autumn/main.dart';
@@ -308,15 +309,9 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
               SizedBox(
                 height: 45,
                 width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.secondary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-
-                  onPressed: () async {
+                child: CustomButtonOne(
+                  text: "Save Transaction",
+                  onTap: () async {
                     if (titleController.text.trim().isEmpty) {
                       CustomSnackbar.show(
                         context,
@@ -379,15 +374,6 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
                     context.read<TransactionBloc>().add(TransactionAdded());
                     Navigator.pop(context);
                   },
-
-                  child: Text(
-                    'Save Transaction',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
                 ),
               ),
 

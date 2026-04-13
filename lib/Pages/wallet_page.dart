@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:spring_autumn/Widgets/Transaction/add_transaction_sheet.dart';
 import 'package:spring_autumn/Widgets/Graphs/bar_graph.dart';
 import 'package:spring_autumn/Widgets/Custom/custom_bold_text.dart';
-import 'package:spring_autumn/Widgets/Custom/custom_floating_action_button.dart';
 import 'package:spring_autumn/Widgets/Graphs/piechart.dart';
 import 'package:spring_autumn/Widgets/Transaction/recent_transactions.dart';
 import 'package:spring_autumn/Model/transaction_model.dart';
 
-final ValueNotifier<DateTime?> selectedMonthNotifier = ValueNotifier<DateTime?>(
-  null,
-);
+final ValueNotifier<DateFilter?> walletFilterNotifier =
+    ValueNotifier<DateFilter?>(null);
 
 class WalletPage extends StatelessWidget {
   const WalletPage({super.key});
@@ -20,9 +17,9 @@ class WalletPage extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      body: ValueListenableBuilder<DateTime?>(
-        valueListenable: selectedMonthNotifier,
-        builder: (context, month, _) {
+      body: ValueListenableBuilder<DateFilter?>(
+        valueListenable: walletFilterNotifier,
+        builder: (context, dateFilter, _) {
           return CustomScrollView(
             physics: const BouncingScrollPhysics(),
             slivers: [
@@ -35,12 +32,12 @@ class WalletPage extends StatelessWidget {
                       const CustomBoldText(text: "Income", size: 20),
                       TextButton.icon(
                         onLongPress: () {
-                          selectedMonthNotifier.value = null;
+                          walletFilterNotifier.value = null;
                         },
                         onPressed: () async {
                           final picked = await showDatePicker(
                             context: context,
-                            initialDate: month ?? DateTime.now(),
+                            initialDate: dateFilter?.date ?? DateTime.now(),
                             firstDate: DateTime(2000),
                             lastDate: DateTime.now(),
                             initialDatePickerMode: DatePickerMode.day,
@@ -61,11 +58,63 @@ class WalletPage extends StatelessWidget {
                             },
                           );
 
-                          if (picked != null) {
-                            selectedMonthNotifier.value = DateTime(
-                              picked.year,
-                              picked.month,
+                          if (picked != null && context.mounted) {
+                            final mode = await showModalBottomSheet<DateFilterMode>(
+                              context: context,
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(16),
+                                ),
+                              ),
+                              builder: (ctx) => SafeArea(
+                                top: false,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(20),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        "Filter by",
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      ListTile(
+                                        leading: const Icon(Iconsax.calendar_1),
+                                        title: Text(
+                                          "This day  (${picked.day}/${picked.month}/${picked.year})",
+                                        ),
+                                        onTap: () => Navigator.pop(
+                                          ctx,
+                                          DateFilterMode.day,
+                                        ),
+                                      ),
+                                      ListTile(
+                                        leading: const Icon(Iconsax.calendar),
+                                        title: Text(
+                                          "This month  (${picked.month}/${picked.year})",
+                                        ),
+                                        onTap: () => Navigator.pop(
+                                          ctx,
+                                          DateFilterMode.month,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
                             );
+
+                            if (mode != null) {
+                              walletFilterNotifier.value = DateFilter(
+                                picked,
+                                mode,
+                              );
+                            }
                           }
                         },
                         icon: Icon(
@@ -73,9 +122,11 @@ class WalletPage extends StatelessWidget {
                           color: Theme.of(context).colorScheme.tertiary,
                         ),
                         label: Text(
-                          month == null
+                          dateFilter == null
                               ? "All time"
-                              : "${month.month}/${month.year}",
+                              : dateFilter.mode == DateFilterMode.day
+                              ? "${dateFilter.date.day}/${dateFilter.date.month}/${dateFilter.date.year}"
+                              : "${dateFilter.date.month}/${dateFilter.date.year}",
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.tertiary,
                           ),
@@ -95,14 +146,14 @@ class WalletPage extends StatelessWidget {
                         width: screenWidth,
                         child: ExpensePieChartCard(
                           type: Type.income,
-                          month: month,
+                          dateFilter: dateFilter,
                         ),
                       ),
                       SizedBox(
                         width: screenWidth,
                         child: ExpenseBarChartCard(
                           type: Type.income,
-                          month: month,
+                          dateFilter: dateFilter,
                         ),
                       ),
                     ],
@@ -111,7 +162,7 @@ class WalletPage extends StatelessWidget {
               ),
               RecentTransactions(
                 filter: TransactionFilter.income,
-                month: month,
+                dateFilter: dateFilter,
               ),
             ],
           );

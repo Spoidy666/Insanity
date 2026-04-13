@@ -9,12 +9,14 @@ import 'package:spring_autumn/Model/transaction_model.dart';
 
 class ExpensePieChartCard extends StatelessWidget {
   final Type type;
-  final DateTime? month;
+  final DateFilter? dateFilter;
+
   const ExpensePieChartCard({
     super.key,
     required this.type,
-    required this.month,
+    required this.dateFilter,
   });
+
   Map<String, double> _buildExpenseData(
     List<Map<String, Object?>> transactions,
     Map<String, String> categoryMap,
@@ -23,13 +25,23 @@ class ExpensePieChartCard extends StatelessWidget {
 
     for (final tx in transactions) {
       if (tx['type'] != type.name) continue;
-      final txDate = DateTime.fromMillisecondsSinceEpoch(
-        tx['transaction_timestamp'] as int,
-      );
 
-      if (month != null) {
-        if (txDate.year != month!.year || txDate.month != month!.month) {
-          continue;
+      if (dateFilter != null) {
+        final txDate = DateTime.fromMillisecondsSinceEpoch(
+          tx['transaction_timestamp'] as int,
+        );
+
+        if (dateFilter!.mode == DateFilterMode.month) {
+          if (txDate.year != dateFilter!.date.year ||
+              txDate.month != dateFilter!.date.month) {
+            continue;
+          }
+        } else {
+          if (txDate.year != dateFilter!.date.year ||
+              txDate.month != dateFilter!.date.month ||
+              txDate.day != dateFilter!.date.day) {
+            continue;
+          }
         }
       }
 
@@ -45,13 +57,7 @@ class ExpensePieChartCard extends StatelessWidget {
 
   Color _generateColor(int index, int total) {
     final hue = (360.0 / total) * index;
-
-    return HSVColor.fromAHSV(
-      1.0, // alpha
-      hue, // hue
-      0.65, // saturation
-      0.85,
-    ).toColor();
+    return HSVColor.fromAHSV(1.0, hue, 0.65, 0.85).toColor();
   }
 
   @override
@@ -89,7 +95,6 @@ class ExpensePieChartCard extends StatelessWidget {
                 "Chart",
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
-
               const SizedBox(height: 26),
               SizedBox(
                 height: 160,
@@ -99,7 +104,6 @@ class ExpensePieChartCard extends StatelessWidget {
                     centerSpaceRadius: 60,
                     sections: data.entries.map((entry) {
                       final color = colorMap[entry.key]!;
-
                       return PieChartSectionData(
                         value: entry.value,
                         color: color,
@@ -116,14 +120,12 @@ class ExpensePieChartCard extends StatelessWidget {
                   ),
                 ),
               ),
-
               const SizedBox(height: 16),
               BlocBuilder<CurrencyCubit, AppCurrency>(
                 builder: (context, currency) {
                   return Column(
                     children: data.entries.map((e) {
                       final color = colorMap[e.key]!;
-
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 4),
                         child: Row(

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:spring_autumn/Widgets/Cards/coffee.dart';
 import 'package:spring_autumn/Widgets/Custom/custom_bold_text.dart';
 import 'package:spring_autumn/Widgets/Custom/custom_primary_text.dart';
+import 'package:spring_autumn/Widgets/Custom/custom_snackbar.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
@@ -24,31 +27,64 @@ class AboutPage extends StatelessWidget {
         slivers: [
           SliverToBoxAdapter(child: AboutContainer()),
           SliverPadding(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(12),
             sliver: SliverToBoxAdapter(
               child: Container(
                 width: double.infinity,
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(14),
                   color: Theme.of(context).colorScheme.primary,
                 ),
-                padding: const EdgeInsets.all(8),
-                child: Row(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(width: 30),
-                    CircleAvatar(
-                      backgroundColor: Theme.of(context).colorScheme.tertiary,
-                    ),
-                    const SizedBox(width: 20),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        CustomPrimaryText(text: "Developer", size: 14),
-                        CustomBoldText(text: "Spoidy", size: 20),
+                    Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 22,
+                          backgroundColor: Theme.of(
+                            context,
+                          ).colorScheme.tertiary,
+                          child: const Icon(Iconsax.user),
+                        ),
+                        const SizedBox(width: 14),
+
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: const [
+                            CustomPrimaryText(text: "Developer", size: 14),
+                            CustomBoldText(text: "Spoidy", size: 18),
+                          ],
+                        ),
                       ],
                     ),
                   ],
                 ),
+              ),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: BuyMeCoffeeCard(
+                onTap: () async {
+                  final url = Uri.parse("https://buymeacoffee.com/vaishnavjsg");
+
+                  if (!await launchUrl(
+                    url,
+                    mode: LaunchMode.externalApplication,
+                  )) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Could not open link")),
+                    );
+                    CustomSnackbar.show(
+                      context,
+                      message: "Could not open link",
+                      type: SnackbarType.error,
+                    );
+                  }
+                },
               ),
             ),
           ),

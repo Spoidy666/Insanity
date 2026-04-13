@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:spring_autumn/Database/database_helper.dart';
 import 'package:spring_autumn/Model/transaction_model.dart';
+import 'package:spring_autumn/Widgets/Custom/custom_button_one.dart';
 import 'package:spring_autumn/Widgets/Custom/custom_snackbar.dart';
 import 'package:uuid/uuid.dart';
 
@@ -20,34 +21,25 @@ Future<void> showImportCsvDialog(BuildContext context) async {
         'Duplicate or invalid rows will be skipped.',
       ),
       actions: [
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
+        Row(
+          children: [
+            Expanded(
+              child: CustomButtonOne(
+                text: "Cancel",
+                onTap: () => Navigator.pop(context),
+              ),
             ),
-          ),
-          onPressed: () => Navigator.pop(context),
-          child: Text(
-            'Cancel',
-            style: TextStyle(color: Theme.of(context).colorScheme.tertiary),
-          ),
-        ),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Theme.of(context).colorScheme.secondary,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
+            SizedBox(width: 10),
+            Expanded(
+              child: CustomButtonOne(
+                text: "Import CSV",
+                onTap: () async {
+                  Navigator.pop(context);
+                  await importCsvTransactions(context);
+                },
+              ),
             ),
-          ),
-          onPressed: () async {
-            Navigator.pop(context);
-            await importCsvTransactions(context);
-          },
-          child: const Text(
-            'Import CSV',
-            style: TextStyle(color: Colors.white),
-          ),
+          ],
         ),
       ],
     ),

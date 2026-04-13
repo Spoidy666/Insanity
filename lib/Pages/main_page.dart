@@ -5,6 +5,7 @@ import 'package:spring_autumn/Pages/payments_page.dart';
 import 'package:spring_autumn/Pages/plan_page.dart';
 import 'package:spring_autumn/Pages/savings_page.dart';
 import 'package:spring_autumn/Pages/wallet_page.dart';
+import 'package:spring_autumn/Theme/glass.dart';
 import 'package:spring_autumn/Widgets/Custom/custom_app_bar.dart';
 import 'package:spring_autumn/Widgets/Custom/custom_bottom_navbar.dart';
 import 'package:spring_autumn/Widgets/Custom/custom_drawer.dart';
@@ -13,8 +14,6 @@ import 'package:spring_autumn/Widgets/Custom/custom_floating_navbar.dart';
 import 'package:spring_autumn/Widgets/Custom/custom_glass_floating_action_button.dart';
 import 'package:spring_autumn/Widgets/Transaction/add_transaction_sheet.dart';
 import 'package:spring_autumn/Model/transaction_model.dart';
-
-ValueNotifier<bool> useGlassNavBar = ValueNotifier(false);
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -86,9 +85,9 @@ class _MainPageState extends State<MainPage> {
               _drawerKey.currentState?.toggleDrawer();
             },
           ),
-          body: ValueListenableBuilder<bool>(
-            valueListenable: useGlassNavBar,
-            builder: (context, isGlass, _) {
+          body: ValueListenableBuilder<GlassConfig>(
+            valueListenable: glassConfig,
+            builder: (context, config, _) {
               return Stack(
                 children: [
                   PageView(
@@ -96,25 +95,25 @@ class _MainPageState extends State<MainPage> {
                     physics: const NeverScrollableScrollPhysics(),
                     children: _pages,
                   ),
-                  if (isGlass)
+                  if (config.navbar)
                     FloatingGlassNavBar(
                       currentIndex: _currentIndex,
                       onTap: _onTabChange,
                     ),
-                  if (_buildFAB(isGlass) != null)
+                  if (_buildFAB(config) != null)
                     Positioned(
-                      bottom: isGlass ? 85 : 20,
+                      bottom: config.navbar ? 85 : 20,
                       right: 20,
-                      child: _buildFAB(isGlass)!,
+                      child: _buildFAB(config)!,
                     ),
                 ],
               );
             },
           ),
-          bottomNavigationBar: ValueListenableBuilder<bool>(
-            valueListenable: useGlassNavBar,
-            builder: (context, isGlass, _) {
-              return isGlass
+          bottomNavigationBar: ValueListenableBuilder<GlassConfig>(
+            valueListenable: glassConfig,
+            builder: (context, config, _) {
+              return config.navbar
                   ? const SizedBox.shrink()
                   : CustomBottomNavBar(
                       currentIndex: _currentIndex,
@@ -127,7 +126,7 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
-  Widget? _buildFAB(bool isGlass) {
+  Widget? _buildFAB(GlassConfig config) {
     void openSheet({Type? type}) {
       showModalBottomSheet(
         context: context,
@@ -143,7 +142,7 @@ class _MainPageState extends State<MainPage> {
     }
 
     Widget buildButton(IconData icon, VoidCallback onTap) {
-      return isGlass
+      return config.fab
           ? GlassFloatingActionButton(icon: icon, onTap: onTap)
           : CustomFloatingActionButton(icon: icon, onTap: onTap);
     }

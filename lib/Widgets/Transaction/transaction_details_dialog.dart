@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:spring_autumn/Bloc/currency/currency_cubit.dart';
 import 'package:spring_autumn/Model/transaction_model.dart';
+import 'package:spring_autumn/Widgets/Custom/custom_button_one.dart';
 import 'package:spring_autumn/Widgets/Transaction/edit_transaction_sheet.dart';
 
 void showTransactionDetailsDialog(
@@ -113,16 +114,9 @@ void showTransactionDetailsDialog(
                   children: [
                     SizedBox(
                       width: double.infinity,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(
-                            context,
-                          ).colorScheme.surface,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        onPressed: () {
+                      child: CustomButtonOne(
+                        text: "Edit",
+                        onTap: () {
                           Navigator.pop(context);
 
                           showModalBottomSheet(
@@ -137,33 +131,14 @@ void showTransactionDetailsDialog(
                                 EditTransactionSheet(transaction: transaction),
                           );
                         },
-                        child: Text(
-                          "Edit",
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.tertiary,
-                          ),
-                        ),
                       ),
                     ),
-
+                    const SizedBox(height: 5),
                     SizedBox(
                       width: double.infinity,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(
-                            context,
-                          ).colorScheme.surface,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        onPressed: () => Navigator.pop(context),
-                        child: Text(
-                          "Close",
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.tertiary,
-                          ),
-                        ),
+                      child: CustomButtonOne(
+                        text: "Close",
+                        onTap: () => Navigator.pop(context),
                       ),
                     ),
                   ],
