@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:spring_autumn/Bloc/Settings/font_size.dart';
 import 'package:spring_autumn/Bloc/currency/currency_cubit.dart';
 import 'package:spring_autumn/Bloc/profile/profile_cubit.dart';
 import 'package:spring_autumn/Bloc/theme_state.dart';
@@ -36,6 +37,7 @@ class MyApp extends StatelessWidget {
         BlocProvider<ThemeBloc>(create: (_) => ThemeBloc()),
         BlocProvider(create: (_) => CurrencyCubit()),
         BlocProvider(create: (_) => ProfileCubit()),
+        BlocProvider(create: (_) => MiniPlayerSettingsCubit()),
         BlocProvider<TransactionBloc>(
           create: (_) => TransactionBloc()..add(LoadTransactions()),
         ),

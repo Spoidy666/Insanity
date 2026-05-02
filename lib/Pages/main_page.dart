@@ -28,7 +28,7 @@ class _MainPageState extends State<MainPage> {
 
   int _currentIndex = 0;
   late PageController _pageController;
-  final List<Widget> _pages = [
+  final List<Widget> _pages = const [
     HomePage(),
     WalletPage(),
     PaymentsPage(),

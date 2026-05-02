@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:spring_autumn/Bloc/Settings/font_size.dart';
 import 'package:spring_autumn/Bloc/profile/profile_cubit.dart';
 import 'package:spring_autumn/Bloc/theme_state.dart';
 import 'package:spring_autumn/Bloc/transactions/transaction__event.dart';
@@ -162,13 +163,10 @@ class SettingsPage extends StatelessWidget {
                   );
                 },
               ),
-
               const SizedBox(height: 25),
 
-              const CustomBoldText(text: "Utilities", size: 17),
-
+              const CustomBoldText(text: "Theme", size: 17),
               const SizedBox(height: 12),
-
               _cardContainer(
                 context,
                 children: [
@@ -199,7 +197,7 @@ class SettingsPage extends StatelessWidget {
                   ),
                   UtilityRow(
                     icon: Iconsax.designtools,
-                    title: "Glass Theme",
+                    title: "Frosted Glass Theme",
                     onTap: () {
                       Navigator.push(
                         context,
@@ -235,12 +233,75 @@ class SettingsPage extends StatelessWidget {
                       onTap: () => showColorPicker(context),
                     ),
                   ),
+
+                  const SizedBox(height: 10),
+                ],
+              ),
+              const SizedBox(height: 25),
+
+              const CustomBoldText(text: "Utilities", size: 17),
+
+              const SizedBox(height: 12),
+
+              _cardContainer(
+                context,
+                children: [
+                  const SizedBox(height: 5),
+
+                  const CurrencySelectorTile(),
                   Divider(
                     thickness: 3,
                     color: Theme.of(context).colorScheme.surface,
                   ),
+                  BlocBuilder<MiniPlayerSettingsCubit, double>(
+                    builder: (context, value) {
+                      return ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: Row(
+                          children: const [
+                            SizedBox(width: 15),
+                            Icon(Iconsax.size),
+                            SizedBox(width: 10),
+                            CustomPrimaryText(text: "Font size", size: 15),
+                          ],
+                        ),
+                        trailing: Padding(
+                          padding: const EdgeInsets.only(right: 20),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              SizedBox(
+                                width: 120,
+                                child: Slider(
+                                  min: 0,
+                                  max: 100,
+                                  divisions: 100,
+                                  value: value,
 
-                  const CurrencySelectorTile(),
+                                  onChanged: (newValue) {
+                                    context
+                                        .read<MiniPlayerSettingsCubit>()
+                                        .update(newValue);
+                                  },
+                                  thumbColor: Theme.of(
+                                    context,
+                                  ).colorScheme.tertiary,
+                                  inactiveColor: Theme.of(
+                                    context,
+                                  ).colorScheme.secondary,
+                                  activeColor: Theme.of(
+                                    context,
+                                  ).colorScheme.tertiary,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Text("${value.toInt()}%"),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                   Divider(
                     thickness: 3,
                     color: Theme.of(context).colorScheme.surface,

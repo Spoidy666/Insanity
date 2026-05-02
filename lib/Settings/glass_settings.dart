@@ -11,7 +11,7 @@ class GlassSettingsPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          "Glass Theme",
+          "Frosted Glass Theme",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         leading: IconButton(
@@ -27,7 +27,7 @@ class GlassSettingsPage extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(20.0, 8.0, 20.0, 10.0),
             child: CustomPrimaryText(
               text:
-                  "Note : This is a preview of the glass theme and can cause performance issues on lower-end devices",
+                  "Note : This is a preview of the frosted glass theme and can cause performance issues on lower-end devices",
               size: 14,
             ),
           ),

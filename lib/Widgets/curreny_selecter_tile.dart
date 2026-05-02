@@ -18,7 +18,7 @@ class CurrencySelectorTile extends StatelessWidget {
               const SizedBox(width: 15),
               Icon(selectedCurrency.icon),
               const SizedBox(width: 10),
-              const CustomPrimaryText(text: "Currency", size: 17),
+              const CustomPrimaryText(text: "Currency", size: 15),
             ],
           ),
           trailing: Padding(
