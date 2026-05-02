@@ -48,7 +48,6 @@ dependencies:
   package_info_plus: ^9.0.0
   path: ^1.9.1
   path_provider: ^2.1.5
-  raven_electrum_client: ^1.2.1
   share_plus: ^12.0.1
   shared_preferences: ^2.5.4
   sqflite: ^2.4.2
@@ -66,14 +65,14 @@ dev_dependencies:
 flutter_icons:
   android: true
   ios: true
-  image_path: "assets/icon/app_icon.png"
+  image_path: "assets/icon/app_icon.webp"
 flutter_native_splash:
   color: "#000000"
-  image: assets/icon/app_icon.png
+  image: assets/icon/app_icon.webp
 
   android_12:
     color: "#000000"
-    image: assets/icon/app_icon.png
+    image: assets/icon/app_icon.webp
 flutter:
 
   # The following line ensures that the Material Icons font is
@@ -82,7 +81,7 @@ flutter:
   uses-material-design: true
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets\icon\app_icon.png
+    - assets\icon\app_icon.webp
   #   - images/a_dot_ham.jpeg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

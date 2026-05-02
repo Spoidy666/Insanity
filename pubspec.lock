@@ -496,14 +496,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.11.0"
-  json_rpc_2:
-    dependency: transitive
-    description:
-      name: json_rpc_2
-      sha256: "246b321532f0e8e2ba474b4d757eaa558ae4fdd0688fdbc1e1ca9705f9b8ca0e"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.3"
   leak_tracker:
     dependency: transitive
     description:
@@ -680,14 +672,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.0"
-  pedantic:
-    dependency: transitive
-    description:
-      name: pedantic
-      sha256: "67fc27ed9639506c856c840ccce7594d0bdcd91bc8d53d6e52359449a1d50602"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.11.1"
   petitparser:
     dependency: transitive
     description:
@@ -736,14 +720,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.0"
-  raven_electrum_client:
-    dependency: "direct main"
-    description:
-      name: raven_electrum_client
-      sha256: "2ef6bd84d07bc14b0b44c34fc25327e279752e5d4384d13f6de589ab21f8bcfd"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.2.1"
   share_plus:
     dependency: "direct main"
     description:
