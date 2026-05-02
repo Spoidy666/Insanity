@@ -137,6 +137,7 @@ class ExpenseLineChartCard extends StatelessWidget {
 
         final gradientColors = [
           Theme.of(context).colorScheme.primary,
+          Theme.of(context).colorScheme.tertiary,
           Theme.of(context).colorScheme.secondary,
         ];
 
@@ -170,25 +171,51 @@ class ExpenseLineChartCard extends StatelessWidget {
                   ),
                   child: LineChart(
                     LineChartData(
+                      lineTouchData: LineTouchData(
+                        handleBuiltInTouches: true,
+                        touchTooltipData: LineTouchTooltipData(
+                          getTooltipColor: (touchedSpot) => Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.8),
+
+                          getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
+                            return touchedBarSpots.map((barSpot) {
+                              final flSpot = barSpot;
+                              return LineTooltipItem(
+                                '${month != null ? "Day " : ""}${flSpot.x.toInt()}\n',
+                                TextStyle(
+                                  color: Theme.of(context).colorScheme.surface,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                children: [
+                                  TextSpan(
+                                    text: NumberFormat.compact().format(
+                                      flSpot.y,
+                                    ),
+                                    style: TextStyle(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.surface,
+                                      fontWeight: FontWeight.w900,
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }).toList();
+                          },
+                        ),
+                      ),
                       gridData: FlGridData(
                         show: true,
-                        drawVerticalLine: true,
+                        drawVerticalLine: false,
                         horizontalInterval: maxY / 5,
-                        verticalInterval: 1,
                         getDrawingHorizontalLine: (value) {
                           return FlLine(
                             color: Theme.of(
                               context,
-                            ).colorScheme.onSurface.withValues(alpha: 0.1),
+                            ).colorScheme.onSurface.withValues(alpha: 0.05),
                             strokeWidth: 1,
-                          );
-                        },
-                        getDrawingVerticalLine: (value) {
-                          return FlLine(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onSurface.withValues(alpha: 0.1),
-                            strokeWidth: 1,
+                            dashArray: [5, 5],
                           );
                         },
                       ),
@@ -218,14 +245,7 @@ class ExpenseLineChartCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                      borderData: FlBorderData(
-                        show: true,
-                        border: Border.all(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.onSurface.withValues(alpha: 0.2),
-                        ),
-                      ),
+                      borderData: FlBorderData(show: false),
                       minX: minX,
                       maxX: maxX,
                       minY: 0,
@@ -234,17 +254,40 @@ class ExpenseLineChartCard extends StatelessWidget {
                         LineChartBarData(
                           spots: spots,
                           isCurved: true,
+                          curveSmoothness: 0.35,
                           gradient: LinearGradient(colors: gradientColors),
-                          barWidth: 3,
+                          barWidth: 4,
                           isStrokeCapRound: true,
-                          dotData: const FlDotData(show: false),
+                          dotData: FlDotData(
+                            show: true,
+                            checkToShowDot: (spot, barData) => spot.y > 0,
+                            getDotPainter: (spot, percent, barData, index) {
+                              return FlDotCirclePainter(
+                                radius: 4,
+                                color: Theme.of(context).colorScheme.surface,
+                                strokeWidth: 2,
+                                strokeColor: Theme.of(
+                                  context,
+                                ).colorScheme.tertiary,
+                              );
+                            },
+                          ),
                           belowBarData: BarAreaData(
                             show: true,
                             gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
                               colors: gradientColors
-                                  .map((color) => color.withValues(alpha: 0.3))
+                                  .map((color) => color.withValues(alpha: 0.2))
                                   .toList(),
                             ),
+                          ),
+                          shadow: Shadow(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.tertiary.withValues(alpha: 0.5),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
                           ),
                         ),
                       ],

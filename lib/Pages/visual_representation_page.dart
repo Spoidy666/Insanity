@@ -3,6 +3,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:spring_autumn/Widgets/Graphs/bar_graph.dart';
 import 'package:spring_autumn/Widgets/modern_type_tab.dart';
 import 'package:spring_autumn/Widgets/Graphs/piechart.dart';
+import 'package:spring_autumn/Widgets/Graphs/line_chart.dart';
 import 'package:spring_autumn/Model/transaction_model.dart';
 
 class VisualRepresentationPage extends StatefulWidget {
@@ -213,8 +214,8 @@ class ChartsSection extends StatelessWidget {
             const SizedBox(height: 40),
             ExpenseBarChartCard(type: type, dateFilter: dateFilter),
             const SizedBox(height: 40),
-            // ExpenseLineChartCard(type: type, dateFilter: dateFilter),
-            // const SizedBox(height: 40),
+            ExpenseLineChartCard(type: type, month: dateFilter?.date),
+            const SizedBox(height: 40),
           ],
         ),
       ),

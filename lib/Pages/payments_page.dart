@@ -9,11 +9,21 @@ import 'package:spring_autumn/Model/transaction_model.dart';
 final ValueNotifier<DateFilter?> paymentsFilterNotifier =
     ValueNotifier<DateFilter?>(null);
 
-class PaymentsPage extends StatelessWidget {
+class PaymentsPage extends StatefulWidget {
   const PaymentsPage({super.key});
 
   @override
+  State<PaymentsPage> createState() => _PaymentsPageState();
+}
+
+class _PaymentsPageState extends State<PaymentsPage>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(

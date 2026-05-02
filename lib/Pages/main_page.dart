@@ -157,6 +157,8 @@ class _MainPageState extends State<MainPage> {
         );
       case 2:
         return buildButton(Iconsax.card_receive, () => openSheet());
+      case 3:
+        return buildButton(Iconsax.add_circle, () => showAddSavingSheet(context));
       default:
         return null;
     }

@@ -244,6 +244,18 @@ class DrawerScaffoldState extends State<DrawerScaffold>
 
   @override
   Widget build(BuildContext context) {
+    // Cache the drawer and main content outside the AnimatedBuilder
+    // so they don't rebuild every frame. Wrapped in RepaintBoundary
+    // so their pixels are rasterized once and then just transformed.
+    final drawerContent = RepaintBoundary(
+      child: CustomDrawer(
+        onItemTap: navigateTo,
+        currentIndex: widget.currentIndex,
+      ),
+    );
+
+    final mainContent = RepaintBoundary(child: widget.child);
+
     return GestureDetector(
       onHorizontalDragUpdate: _onDragUpdate,
       onHorizontalDragEnd: _onDragEnd,
@@ -255,22 +267,16 @@ class DrawerScaffoldState extends State<DrawerScaffold>
 
           return Stack(
             children: [
-              RepaintBoundary(
-                child: Opacity(
-                  opacity: 0.7 + (0.3 * _animation.value),
-                  child: Transform(
-                    alignment: Alignment.centerLeft,
-                    transform: Matrix4.identity()
-                      ..translate(-60 * (1 - _animation.value))
-                      ..scale(0.95 + (0.05 * _animation.value), 1.0),
-                    child: CustomDrawer(
-                      onItemTap: navigateTo,
-                      currentIndex: widget.currentIndex,
-                    ),
-                  ),
+              Opacity(
+                opacity: 0.7 + (0.3 * _animation.value),
+                child: Transform(
+                  alignment: Alignment.centerLeft,
+                  transform: Matrix4.identity()
+                    ..translate(-60 * (1 - _animation.value))
+                    ..scale(0.95 + (0.05 * _animation.value), 1.0),
+                  child: drawerContent,
                 ),
               ),
-
               Transform(
                 alignment: Alignment.centerLeft,
                 transform: Matrix4.identity()..translate(slide),
@@ -278,7 +284,7 @@ class DrawerScaffoldState extends State<DrawerScaffold>
                   borderRadius: BorderRadius.circular(radius),
                   child: Stack(
                     children: [
-                      widget.child,
+                      mainContent,
                       if (_animation.value > 0)
                         GestureDetector(
                           onTap: toggleDrawer,
