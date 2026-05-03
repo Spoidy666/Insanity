@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:spring_autumn/Pages/about_page.dart';
 import 'package:spring_autumn/Pages/home_page.dart';
 import 'package:spring_autumn/Pages/payments_page.dart';
 import 'package:spring_autumn/Pages/plan_page.dart';
 import 'package:spring_autumn/Pages/savings_page.dart';
+import 'package:spring_autumn/Pages/visual_representation_page.dart';
 import 'package:spring_autumn/Pages/wallet_page.dart';
+import 'package:spring_autumn/Settings/glass_settings.dart';
+import 'package:spring_autumn/Settings/settings_page.dart';
 import 'package:spring_autumn/Theme/glass.dart';
 import 'package:spring_autumn/Widgets/Custom/custom_app_bar.dart';
 import 'package:spring_autumn/Widgets/Custom/custom_bottom_navbar.dart';
@@ -15,6 +19,8 @@ import 'package:spring_autumn/Widgets/Custom/custom_glass_floating_action_button
 import 'package:spring_autumn/Widgets/Transaction/add_transaction_sheet.dart';
 import 'package:spring_autumn/Model/transaction_model.dart';
 
+enum OverlayPage { settings, graphs, glass, about }
+
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
 
@@ -23,6 +29,28 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
+  final List<OverlayPage> _pageStack = [];
+  bool get _hasOverlay => _pageStack.isNotEmpty;
+  OverlayPage? get _currentOverlay => _pageStack.lastOrNull;
+
+  void _pushOverlay(OverlayPage page) {
+    setState(() => _pageStack.add(page));
+  }
+
+  void _popOverlay() {
+    if (_pageStack.isNotEmpty) setState(() => _pageStack.removeLast());
+  }
+
+  Widget _buildOverlayWidget(OverlayPage page) {
+    return switch (page) {
+      OverlayPage.settings => SettingsPage(onOverlayNavigate: _pushOverlay),
+      OverlayPage.graphs => const VisualRepresentationPage(),
+      OverlayPage.glass => const GlassSettingsPage(),
+
+      OverlayPage.about => const AboutPage(),
+    };
+  }
+
   final GlobalKey<DrawerScaffoldState> _drawerKey =
       GlobalKey<DrawerScaffoldState>();
 
@@ -60,6 +88,7 @@ class _MainPageState extends State<MainPage> {
   }
 
   void _onTabChange(int newIndex) {
+    if (_pageStack.isNotEmpty) setState(() => _pageStack.clear());
     if (newIndex == _currentIndex) return;
     _pageController.animateToPage(
       newIndex,
@@ -74,16 +103,21 @@ class _MainPageState extends State<MainPage> {
       currentIndex: _currentIndex,
       onNavigate: (index) {
         _onTabChange(index);
+        _popOverlay();
       },
+      onOverlayNavigate: _pushOverlay,
+      activeOverlay: _currentOverlay,
       key: _drawerKey,
       child: SafeArea(
         top: false,
         child: Scaffold(
           appBar: CustomAppBar(
-            title: "",
-            onMenuTap: () {
-              _drawerKey.currentState?.toggleDrawer();
-            },
+            title: _currentOverlay?.label ?? "",
+            showBackButton: _hasOverlay,
+            onBackTap: _popOverlay,
+            onMenuTap: () => _drawerKey.currentState?.toggleDrawer(),
+            onSettingsTap: () => _pushOverlay(OverlayPage.settings),
+            isSettingsActive: _currentOverlay == OverlayPage.settings,
           ),
           body: ValueListenableBuilder<GlassConfig>(
             valueListenable: glassConfig,
@@ -95,12 +129,35 @@ class _MainPageState extends State<MainPage> {
                     physics: const NeverScrollableScrollPhysics(),
                     children: _pages,
                   ),
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    switchInCurve: Curves.easeInOutCubic,
+                    switchOutCurve: Curves.easeInOutCubic,
+                    transitionBuilder: (child, animation) {
+                      final slide = Tween<Offset>(
+                        begin: const Offset(1, 0),
+                        end: Offset.zero,
+                      ).animate(animation);
+                      return SlideTransition(position: slide, child: child);
+                    },
+                    child: _hasOverlay
+                        ? KeyedSubtree(
+                            key: ValueKey(
+                              _currentOverlay,
+                            ), // key drives the animation
+                            child: Container(
+                              color: Theme.of(context).colorScheme.surface,
+                              child: _buildOverlayWidget(_currentOverlay!),
+                            ),
+                          )
+                        : const SizedBox.shrink(),
+                  ),
                   if (config.navbar)
                     FloatingGlassNavBar(
                       currentIndex: _currentIndex,
                       onTap: _onTabChange,
                     ),
-                  if (_buildFAB(config) != null)
+                  if (_buildFAB(config) != null && !_hasOverlay)
                     Positioned(
                       bottom: config.navbar ? 85 : 20,
                       right: 20,
@@ -158,9 +215,21 @@ class _MainPageState extends State<MainPage> {
       case 2:
         return buildButton(Iconsax.card_receive, () => openSheet());
       case 3:
-        return buildButton(Iconsax.add_circle, () => showAddSavingSheet(context));
+        return buildButton(
+          Iconsax.add_circle,
+          () => showAddSavingSheet(context),
+        );
       default:
         return null;
     }
   }
+}
+
+extension OverlayPageLabel on OverlayPage {
+  String get label => switch (this) {
+    OverlayPage.settings => "Settings",
+    OverlayPage.graphs => "Graph View",
+    OverlayPage.glass => "Frosted Glass Theme",
+    OverlayPage.about => "About ",
+  };
 }

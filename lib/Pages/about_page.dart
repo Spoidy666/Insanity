@@ -13,15 +13,6 @@ class AboutPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("About"),
-        leading: IconButton(
-          icon: Icon(Iconsax.arrow_left_1),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-      ),
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
@@ -133,7 +124,7 @@ class _AboutContainerState extends State<AboutContainer> {
             const SizedBox(height: 20),
             const CircleAvatar(
               radius: 30,
-              backgroundImage: AssetImage('assets/icon/app_icon.png'),
+              backgroundImage: AssetImage('assets/icon/app_icon.webp'),
             ),
             const SizedBox(height: 8),
             const CustomBoldText(text: "Insanity", size: 20),

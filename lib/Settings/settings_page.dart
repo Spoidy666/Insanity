@@ -8,9 +8,8 @@ import 'package:spring_autumn/Bloc/theme_state.dart';
 import 'package:spring_autumn/Bloc/transactions/transaction__event.dart';
 import 'package:spring_autumn/Bloc/transactions/transaction_bloc.dart';
 import 'package:spring_autumn/Database/database_helper.dart';
-import 'package:spring_autumn/Pages/about_page.dart';
+import 'package:spring_autumn/Pages/main_page.dart';
 import 'package:spring_autumn/Settings/edit_profile_sheet.dart';
-import 'package:spring_autumn/Settings/glass_settings.dart';
 import 'package:spring_autumn/Widgets/Custom/custom_button_one.dart';
 import 'package:spring_autumn/Widgets/Custom/custom_snackbar.dart';
 import 'package:spring_autumn/Widgets/color_picker_wheel.dart';
@@ -22,353 +21,327 @@ import 'package:spring_autumn/Widgets/importAndExport/import_export.dart';
 import 'package:spring_autumn/Widgets/theme_toggle.dart';
 
 class SettingsPage extends StatelessWidget {
-  const SettingsPage({super.key});
+  final void Function(OverlayPage page)? onOverlayNavigate;
+  const SettingsPage({super.key, this.onOverlayNavigate});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return SafeArea(
-      top: false,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            "Settings",
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          leading: IconButton(
-            icon: Icon(Iconsax.arrow_left_2),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-        ),
-        backgroundColor: theme.colorScheme.surface,
-        body: SingleChildScrollView(
-          physics: BouncingScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 15),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              BlocBuilder<ProfileCubit, ProfileModel>(
-                builder: (context, profile) {
-                  return Center(
-                    child: Column(
-                      children: [
-                        CircleAvatar(
-                          radius: 45,
-                          backgroundColor: Theme.of(
-                            context,
-                          ).colorScheme.secondary.withValues(alpha: 0.25),
-                          backgroundImage: profile.imagePath != null
-                              ? FileImage(File(profile.imagePath!))
-                              : null,
-                          child: profile.imagePath == null
-                              ? Text(
-                                  (profile.name != null &&
-                                          profile.name!.trim().isNotEmpty)
-                                      ? profile.name!.trim()[0].toUpperCase()
-                                      : "?",
-                                  style: TextStyle(
-                                    fontSize: 28,
-                                    fontWeight: FontWeight.bold,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.tertiary,
-                                  ),
-                                )
-                              : null,
-                        ),
-
-                        const SizedBox(height: 15),
-                        InkWell(
-                          splashColor: Colors.transparent,
-                          highlightColor: Colors.transparent,
-                          hoverColor: Colors.transparent,
-
-                          child: Text(
-                            profile.name,
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          onTap: () {
-                            showModalBottomSheet(
-                              context: context,
-                              isScrollControlled: true,
-                              shape: const RoundedRectangleBorder(
-                                borderRadius: BorderRadius.vertical(
-                                  top: Radius.circular(16),
-                                ),
-                              ),
-                              builder: (_) => const EditProfileSheet(),
-                            );
-                          },
-                        ),
-                        const SizedBox(height: 5),
-                      ],
-                    ),
-                  );
-                },
-              ),
-
-              const SizedBox(height: 20),
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const CustomBoldText(text: "Personal Information", size: 17),
-                  IconButton(
-                    onPressed: () {
-                      showModalBottomSheet(
-                        context: context,
-                        isScrollControlled: true,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.vertical(
-                            top: Radius.circular(16),
-                          ),
-                        ),
-                        builder: (_) => const EditProfileSheet(),
-                      );
-                    },
-                    icon: Icon(Iconsax.edit),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 12),
-
-              BlocBuilder<ProfileCubit, ProfileModel>(
-                builder: (context, profile) {
-                  return _cardContainer(
-                    context,
+    return Scaffold(
+      body: SingleChildScrollView(
+        physics: BouncingScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 15),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            BlocBuilder<ProfileCubit, ProfileModel>(
+              builder: (context, profile) {
+                return Center(
+                  child: Column(
                     children: [
-                      _InfoRow(
-                        icon: Iconsax.sms,
-                        title: "Email",
-                        value: profile.email,
+                      CircleAvatar(
+                        radius: 45,
+                        backgroundColor: Theme.of(
+                          context,
+                        ).colorScheme.secondary.withValues(alpha: 0.25),
+                        backgroundImage: profile.imagePath != null
+                            ? FileImage(File(profile.imagePath!))
+                            : null,
+                        child: profile.imagePath == null
+                            ? Text(
+                                (profile.name != null &&
+                                        profile.name!.trim().isNotEmpty)
+                                    ? profile.name!.trim()[0].toUpperCase()
+                                    : "?",
+                                style: TextStyle(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.bold,
+                                  color: Theme.of(context).colorScheme.tertiary,
+                                ),
+                              )
+                            : null,
                       ),
-                      Divider(
-                        thickness: 3,
-                        color: Theme.of(context).colorScheme.surface,
-                      ),
-                      _InfoRow(
-                        icon: Iconsax.call,
-                        title: "Phone",
-                        value: profile.phone,
+
+                      const SizedBox(height: 15),
+                      InkWell(
+                        splashColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        hoverColor: Colors.transparent,
+
+                        child: Text(
+                          profile.name,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        onTap: () {
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(
+                                top: Radius.circular(16),
+                              ),
+                            ),
+                            builder: (_) => const EditProfileSheet(),
+                          );
+                        },
                       ),
                       const SizedBox(height: 5),
                     ],
-                  );
-                },
-              ),
-              const SizedBox(height: 25),
+                  ),
+                );
+              },
+            ),
 
-              const CustomBoldText(text: "Theme", size: 17),
-              const SizedBox(height: 12),
-              _cardContainer(
-                context,
-                children: [
-                  const SizedBox(height: 5),
-                  BlocBuilder<ThemeBloc, ThemeState>(
-                    builder: (context, state) {
-                      final isDark =
-                          state.themeData.brightness == Brightness.dark;
+            const SizedBox(height: 20),
 
-                      return ListTile(
-                        leading: const Icon(Iconsax.brush),
-                        title: const CustomPrimaryText(
-                          text: "Theme Mode",
-                          size: 15,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const CustomBoldText(text: "Personal Information", size: 17),
+                IconButton(
+                  onPressed: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(16),
                         ),
-                        trailing: ThemeToggle(
-                          isDark: isDark,
-                          onToggle: () {
-                            context.read<ThemeBloc>().add(ToggleTheme());
-                          },
-                        ),
-                      );
-                    },
-                  ),
-                  Divider(
-                    thickness: 3,
-                    color: Theme.of(context).colorScheme.surface,
-                  ),
-                  UtilityRow(
-                    icon: Iconsax.designtools,
-                    title: "Frosted Glass Theme",
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const GlassSettingsPage(),
-                        ),
-                      );
-                    },
-                  ),
-                  Divider(
-                    thickness: 3,
-                    color: Theme.of(context).colorScheme.surface,
-                  ),
-                  Theme(
-                    data: Theme.of(context).copyWith(
-                      splashColor: Colors.transparent,
-                      highlightColor: Colors.transparent,
-                      hoverColor: Colors.transparent,
+                      ),
+                      builder: (_) => const EditProfileSheet(),
+                    );
+                  },
+                  icon: Icon(Iconsax.edit),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 12),
+
+            BlocBuilder<ProfileCubit, ProfileModel>(
+              builder: (context, profile) {
+                return _cardContainer(
+                  context,
+                  children: [
+                    _InfoRow(
+                      icon: Iconsax.sms,
+                      title: "Email",
+                      value: profile.email,
                     ),
-                    child: ListTile(
-                      leading: const Icon(Iconsax.colorfilter),
+                    Divider(
+                      thickness: 3,
+                      color: Theme.of(context).colorScheme.surface,
+                    ),
+                    _InfoRow(
+                      icon: Iconsax.call,
+                      title: "Phone",
+                      value: profile.phone,
+                    ),
+                    const SizedBox(height: 5),
+                  ],
+                );
+              },
+            ),
+            const SizedBox(height: 25),
+
+            const CustomBoldText(text: "Theme", size: 17),
+            const SizedBox(height: 12),
+            _cardContainer(
+              context,
+              children: [
+                const SizedBox(height: 5),
+                BlocBuilder<ThemeBloc, ThemeState>(
+                  builder: (context, state) {
+                    final isDark =
+                        state.themeData.brightness == Brightness.dark;
+
+                    return ListTile(
+                      leading: const Icon(Iconsax.brush),
                       title: const CustomPrimaryText(
-                        text: "Accent Color",
+                        text: "Theme Mode",
                         size: 15,
                       ),
-                      trailing: CircleAvatar(
-                        radius: 12,
-                        backgroundColor: context
-                            .watch<ThemeBloc>()
-                            .state
-                            .accentColor,
+                      trailing: ThemeToggle(
+                        isDark: isDark,
+                        onToggle: () {
+                          context.read<ThemeBloc>().add(ToggleTheme());
+                        },
                       ),
-                      onTap: () => showColorPicker(context),
+                    );
+                  },
+                ),
+                Divider(
+                  thickness: 3,
+                  color: Theme.of(context).colorScheme.surface,
+                ),
+                UtilityRow(
+                  icon: Iconsax.designtools,
+                  title: "Frosted Glass Theme",
+                  onTap: () {
+                    onOverlayNavigate?.call(OverlayPage.glass);
+                  },
+                ),
+                Divider(
+                  thickness: 3,
+                  color: Theme.of(context).colorScheme.surface,
+                ),
+                Theme(
+                  data: Theme.of(context).copyWith(
+                    splashColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                    hoverColor: Colors.transparent,
+                  ),
+                  child: ListTile(
+                    leading: const Icon(Iconsax.colorfilter),
+                    title: const CustomPrimaryText(
+                      text: "Accent Color",
+                      size: 15,
                     ),
+                    trailing: CircleAvatar(
+                      radius: 12,
+                      backgroundColor: context
+                          .watch<ThemeBloc>()
+                          .state
+                          .accentColor,
+                    ),
+                    onTap: () => showColorPicker(context),
                   ),
+                ),
 
-                  const SizedBox(height: 10),
-                ],
-              ),
-              const SizedBox(height: 25),
+                const SizedBox(height: 10),
+              ],
+            ),
+            const SizedBox(height: 25),
 
-              const CustomBoldText(text: "Utilities", size: 17),
+            const CustomBoldText(text: "Utilities", size: 17),
 
-              const SizedBox(height: 12),
+            const SizedBox(height: 12),
 
-              _cardContainer(
-                context,
-                children: [
-                  const SizedBox(height: 5),
+            _cardContainer(
+              context,
+              children: [
+                const SizedBox(height: 5),
 
-                  const CurrencySelectorTile(),
-                  Divider(
-                    thickness: 3,
-                    color: Theme.of(context).colorScheme.surface,
-                  ),
-                  BlocBuilder<MiniPlayerSettingsCubit, double>(
-                    builder: (context, value) {
-                      return ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        title: Row(
-                          children: const [
-                            SizedBox(width: 15),
-                            Icon(Iconsax.size),
-                            SizedBox(width: 10),
-                            CustomPrimaryText(text: "Font size", size: 15),
+                const CurrencySelectorTile(),
+                Divider(
+                  thickness: 3,
+                  color: Theme.of(context).colorScheme.surface,
+                ),
+                BlocBuilder<MiniPlayerSettingsCubit, double>(
+                  builder: (context, value) {
+                    return ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Row(
+                        children: const [
+                          SizedBox(width: 15),
+                          Icon(Iconsax.size),
+                          SizedBox(width: 10),
+                          CustomPrimaryText(text: "Font size", size: 15),
+                        ],
+                      ),
+                      trailing: Padding(
+                        padding: const EdgeInsets.only(right: 20),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SizedBox(
+                              width: 120,
+                              child: Slider(
+                                min: 0,
+                                max: 100,
+                                divisions: 100,
+                                value: value,
+
+                                onChanged: (newValue) {
+                                  context
+                                      .read<MiniPlayerSettingsCubit>()
+                                      .update(newValue);
+                                },
+                                thumbColor: Theme.of(
+                                  context,
+                                ).colorScheme.tertiary,
+                                inactiveColor: Theme.of(
+                                  context,
+                                ).colorScheme.secondary,
+                                activeColor: Theme.of(
+                                  context,
+                                ).colorScheme.tertiary,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Text("${value.toInt()}%"),
                           ],
                         ),
-                        trailing: Padding(
-                          padding: const EdgeInsets.only(right: 20),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              SizedBox(
-                                width: 120,
-                                child: Slider(
-                                  min: 0,
-                                  max: 100,
-                                  divisions: 100,
-                                  value: value,
-
-                                  onChanged: (newValue) {
-                                    context
-                                        .read<MiniPlayerSettingsCubit>()
-                                        .update(newValue);
-                                  },
-                                  thumbColor: Theme.of(
-                                    context,
-                                  ).colorScheme.tertiary,
-                                  inactiveColor: Theme.of(
-                                    context,
-                                  ).colorScheme.secondary,
-                                  activeColor: Theme.of(
-                                    context,
-                                  ).colorScheme.tertiary,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Text("${value.toInt()}%"),
-                            ],
-                          ),
+                      ),
+                    );
+                  },
+                ),
+                Divider(
+                  thickness: 3,
+                  color: Theme.of(context).colorScheme.surface,
+                ),
+                UtilityRow(
+                  icon: Iconsax.card,
+                  title: "Default Payment Method",
+                  onTap: () async {
+                    showModalBottomSheet(
+                      context: context,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(16),
                         ),
-                      );
-                    },
-                  ),
-                  Divider(
-                    thickness: 3,
-                    color: Theme.of(context).colorScheme.surface,
-                  ),
-                  UtilityRow(
-                    icon: Iconsax.card,
-                    title: "Default Payment Method",
-                    onTap: () async {
-                      showModalBottomSheet(
-                        context: context,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.vertical(
-                            top: Radius.circular(16),
-                          ),
-                        ),
-                        builder: (_) => DefaultMethodSheet(),
-                      );
-                    },
-                  ),
-                  Divider(
-                    thickness: 3,
-                    color: Theme.of(context).colorScheme.surface,
-                  ),
-                  UtilityRow(
-                    icon: Iconsax.box_remove,
-                    title: "Delete Category",
-                    onTap: () => _showDeleteCategoryPopup(context),
-                  ),
-                  Divider(
-                    thickness: 3,
-                    color: Theme.of(context).colorScheme.surface,
-                  ),
-                  UtilityRow(
-                    icon: Iconsax.import_1,
-                    title: "Import",
-                    onTap: () => showImportCsvDialog(context),
-                  ),
-                  Divider(
-                    thickness: 3,
-                    color: Theme.of(context).colorScheme.surface,
-                  ),
-                  UtilityRow(
-                    icon: Iconsax.export_1,
-                    title: "Export",
-                    onTap: () => exportTransactionsToCsv(context),
-                  ),
-                  Divider(
-                    thickness: 3,
-                    color: Theme.of(context).colorScheme.surface,
-                  ),
+                      ),
+                      builder: (_) => DefaultMethodSheet(),
+                    );
+                  },
+                ),
+                Divider(
+                  thickness: 3,
+                  color: Theme.of(context).colorScheme.surface,
+                ),
+                UtilityRow(
+                  icon: Iconsax.box_remove,
+                  title: "Delete Category",
+                  onTap: () => _showDeleteCategoryPopup(context),
+                ),
+                Divider(
+                  thickness: 3,
+                  color: Theme.of(context).colorScheme.surface,
+                ),
+                UtilityRow(
+                  icon: Iconsax.import_1,
+                  title: "Import",
+                  onTap: () => showImportCsvDialog(context),
+                ),
+                Divider(
+                  thickness: 3,
+                  color: Theme.of(context).colorScheme.surface,
+                ),
+                UtilityRow(
+                  icon: Iconsax.export_1,
+                  title: "Export",
+                  onTap: () => exportTransactionsToCsv(context),
+                ),
+                Divider(
+                  thickness: 3,
+                  color: Theme.of(context).colorScheme.surface,
+                ),
 
-                  UtilityRow(
-                    icon: Iconsax.info_circle,
-                    title: "About",
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const AboutPage()),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                ],
-              ),
-              const SizedBox(height: 20),
-            ],
-          ),
+                UtilityRow(
+                  icon: Iconsax.info_circle,
+                  title: "About",
+
+                  onTap: () => onOverlayNavigate?.call(OverlayPage.about),
+                ),
+                const SizedBox(height: 10),
+              ],
+            ),
+            const SizedBox(height: 20),
+          ],
         ),
       ),
     );

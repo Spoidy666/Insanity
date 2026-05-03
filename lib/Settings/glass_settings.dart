@@ -9,18 +9,6 @@ class GlassSettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          "Frosted Glass Theme",
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        leading: IconButton(
-          icon: Icon(Iconsax.arrow_left_2),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-      ),
       body: Column(
         children: [
           Padding(

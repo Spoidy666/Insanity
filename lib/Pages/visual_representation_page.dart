@@ -34,142 +34,131 @@ class _VisualRepresentationPageState extends State<VisualRepresentationPage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text("Graphs"),
-          leading: IconButton(
-            icon: const Icon(Iconsax.arrow_left_1),
-            onPressed: () => Navigator.pop(context),
+    return Scaffold(
+      body: Column(
+        children: [
+          const SizedBox(height: 8),
+          TypeToggleTab(
+            selected: selectedType,
+            onChanged: (type) {
+              setState(() => selectedType = type);
+              _pageController.animateToPage(
+                type.index,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOutCubic,
+              );
+            },
           ),
-        ),
-        body: Column(
-          children: [
-            const SizedBox(height: 8),
-            TypeToggleTab(
-              selected: selectedType,
-              onChanged: (type) {
-                setState(() => selectedType = type);
-                _pageController.animateToPage(
-                  type.index,
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeInOutCubic,
-                );
-              },
-            ),
 
-            const SizedBox(height: 8),
+          const SizedBox(height: 8),
 
-            TextButton.icon(
-              onLongPress: () {
-                setState(() => selectedFilter = null);
-              },
-              onPressed: () async {
-                final picked = await showDatePicker(
-                  context: context,
-                  initialDate: selectedFilter?.date ?? DateTime.now(),
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime.now(),
-                  initialDatePickerMode: DatePickerMode.day,
-                  builder: (context, child) {
-                    final theme = Theme.of(context);
-                    return Theme(
-                      data: theme.copyWith(
-                        colorScheme: theme.colorScheme,
-                        textButtonTheme: TextButtonThemeData(
-                          style: TextButton.styleFrom(
-                            foregroundColor: theme.colorScheme.tertiary,
-                          ),
-                        ),
-                      ),
-                      child: child!,
-                    );
-                  },
-                );
-
-                if (picked != null && context.mounted) {
-                  final mode = await showModalBottomSheet<DateFilterMode>(
-                    context: context,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(16),
-                      ),
-                    ),
-                    builder: (ctx) => SafeArea(
-                      top: false,
-                      child: Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              "Filter by",
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            ListTile(
-                              leading: const Icon(Iconsax.calendar_1),
-                              title: Text(
-                                "This day  (${picked.day}/${picked.month}/${picked.year})",
-                              ),
-                              onTap: () =>
-                                  Navigator.pop(ctx, DateFilterMode.day),
-                            ),
-                            ListTile(
-                              leading: const Icon(Iconsax.calendar),
-                              title: Text(
-                                "This month  (${picked.month}/${picked.year})",
-                              ),
-                              onTap: () =>
-                                  Navigator.pop(ctx, DateFilterMode.month),
-                            ),
-                          ],
+          TextButton.icon(
+            onLongPress: () {
+              setState(() => selectedFilter = null);
+            },
+            onPressed: () async {
+              final picked = await showDatePicker(
+                context: context,
+                initialDate: selectedFilter?.date ?? DateTime.now(),
+                firstDate: DateTime(2000),
+                lastDate: DateTime.now(),
+                initialDatePickerMode: DatePickerMode.day,
+                builder: (context, child) {
+                  final theme = Theme.of(context);
+                  return Theme(
+                    data: theme.copyWith(
+                      colorScheme: theme.colorScheme,
+                      textButtonTheme: TextButtonThemeData(
+                        style: TextButton.styleFrom(
+                          foregroundColor: theme.colorScheme.tertiary,
                         ),
                       ),
                     ),
+                    child: child!,
                   );
-
-                  if (mode != null) {
-                    setState(() {
-                      selectedFilter = DateFilter(picked, mode);
-                    });
-                  }
-                }
-              },
-              icon: Icon(
-                Iconsax.calendar_edit,
-                color: Theme.of(context).colorScheme.tertiary,
-              ),
-              label: Text(
-                selectedFilter == null
-                    ? "All time"
-                    : selectedFilter!.mode == DateFilterMode.day
-                    ? "${selectedFilter!.date.day}/${selectedFilter!.date.month}/${selectedFilter!.date.year}"
-                    : "${selectedFilter!.date.month}/${selectedFilter!.date.year}",
-                style: TextStyle(color: Theme.of(context).colorScheme.tertiary),
-              ),
-            ),
-
-            const SizedBox(height: 12),
-            Expanded(
-              child: PageView(
-                controller: _pageController,
-                onPageChanged: (index) {
-                  setState(() => selectedType = Type.values[index]);
                 },
-                children: [
-                  ChartsSection(type: Type.income, dateFilter: selectedFilter),
-                  ChartsSection(type: Type.expense, dateFilter: selectedFilter),
-                ],
-              ),
+              );
+
+              if (picked != null && context.mounted) {
+                final mode = await showModalBottomSheet<DateFilterMode>(
+                  context: context,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(16),
+                    ),
+                  ),
+                  builder: (ctx) => SafeArea(
+                    top: false,
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Filter by",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          ListTile(
+                            leading: const Icon(Iconsax.calendar_1),
+                            title: Text(
+                              "This day  (${picked.day}/${picked.month}/${picked.year})",
+                            ),
+                            onTap: () => Navigator.pop(ctx, DateFilterMode.day),
+                          ),
+                          ListTile(
+                            leading: const Icon(Iconsax.calendar),
+                            title: Text(
+                              "This month  (${picked.month}/${picked.year})",
+                            ),
+                            onTap: () =>
+                                Navigator.pop(ctx, DateFilterMode.month),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+
+                if (mode != null) {
+                  setState(() {
+                    selectedFilter = DateFilter(picked, mode);
+                  });
+                }
+              }
+            },
+            icon: Icon(
+              Iconsax.calendar_edit,
+              color: Theme.of(context).colorScheme.tertiary,
             ),
-          ],
-        ),
+            label: Text(
+              selectedFilter == null
+                  ? "All time"
+                  : selectedFilter!.mode == DateFilterMode.day
+                  ? "${selectedFilter!.date.day}/${selectedFilter!.date.month}/${selectedFilter!.date.year}"
+                  : "${selectedFilter!.date.month}/${selectedFilter!.date.year}",
+              style: TextStyle(color: Theme.of(context).colorScheme.tertiary),
+            ),
+          ),
+
+          const SizedBox(height: 12),
+          Expanded(
+            child: PageView(
+              controller: _pageController,
+              onPageChanged: (index) {
+                setState(() => selectedType = Type.values[index]);
+              },
+              children: [
+                ChartsSection(type: Type.income, dateFilter: selectedFilter),
+                ChartsSection(type: Type.expense, dateFilter: selectedFilter),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

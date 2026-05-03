@@ -1,11 +1,8 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:spring_autumn/Bloc/theme_state.dart';
-import 'package:spring_autumn/Pages/visual_representation_page.dart';
-import 'package:spring_autumn/Settings/settings_page.dart';
+import 'package:spring_autumn/Pages/main_page.dart';
 import 'package:spring_autumn/Widgets/Custom/custom_icon_button_one.dart';
 import 'package:spring_autumn/Widgets/drawer_button.dart';
 import 'package:spring_autumn/Widgets/drawer_theme_toggle.dart';
@@ -14,11 +11,14 @@ import 'package:spring_autumn/Widgets/importAndExport/import_export.dart';
 class CustomDrawer extends StatelessWidget {
   final void Function(int index) onItemTap;
   final int currentIndex;
-
+  final void Function(OverlayPage page) onOverlayNavigate;
+  final OverlayPage? activeOverlay;
   const CustomDrawer({
     super.key,
     required this.onItemTap,
     required this.currentIndex,
+    required this.onOverlayNavigate,
+    this.activeOverlay,
   });
 
   @override
@@ -98,14 +98,9 @@ class CustomDrawer extends StatelessWidget {
                           CustomDrawerButton(
                             name: "Graphs",
                             onTap: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (_) =>
-                                      const VisualRepresentationPage(),
-                                ),
-                              );
+                              onOverlayNavigate(OverlayPage.graphs);
                             },
-                            isActive: false,
+                            isActive: activeOverlay == OverlayPage.graphs,
                             i: Iconsax.status,
                           ),
                           const SizedBox(height: 10),
@@ -147,11 +142,7 @@ class CustomDrawer extends StatelessWidget {
                     child: CustomIconButtonOne(
                       icon: Iconsax.setting_24,
                       onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => const SettingsPage(),
-                          ),
-                        );
+                        onOverlayNavigate(OverlayPage.settings);
                       },
                     ),
                   ),
@@ -171,12 +162,16 @@ class DrawerScaffold extends StatefulWidget {
   final Widget child;
   final ValueChanged<int> onNavigate;
   final int currentIndex;
+  final void Function(OverlayPage page) onOverlayNavigate;
+  final OverlayPage? activeOverlay;
 
   const DrawerScaffold({
     super.key,
     required this.child,
     required this.onNavigate,
     required this.currentIndex,
+    required this.onOverlayNavigate,
+    this.activeOverlay,
   });
 
   @override
@@ -251,6 +246,8 @@ class DrawerScaffoldState extends State<DrawerScaffold>
       child: CustomDrawer(
         onItemTap: navigateTo,
         currentIndex: widget.currentIndex,
+        onOverlayNavigate: overlayNavigate,
+        activeOverlay: widget.activeOverlay,
       ),
     );
 
@@ -303,5 +300,10 @@ class DrawerScaffoldState extends State<DrawerScaffold>
         },
       ),
     );
+  }
+
+  void overlayNavigate(OverlayPage page) {
+    widget.onOverlayNavigate(page);
+    _controller.reverse();
   }
 }
