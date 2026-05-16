@@ -11,10 +11,11 @@ import 'package:spring_autumn/Bloc/transactions/transaction_state.dart';
 import 'package:spring_autumn/Database/database_helper.dart';
 import 'package:spring_autumn/Model/transaction_model.dart';
 import '../Cards/transaction_tile.dart';
+import 'package:super_sliver_list/super_sliver_list.dart';
 
 enum TransactionFilter { all, income, expense }
 
-class RecentTransactions extends StatelessWidget {
+class RecentTransactions extends StatefulWidget {
   final TransactionFilter filter;
   final DateFilter? dateFilter;
 
@@ -23,6 +24,72 @@ class RecentTransactions extends StatelessWidget {
     required this.filter,
     required this.dateFilter,
   });
+
+  @override
+  State<RecentTransactions> createState() => _RecentTransactionsState();
+}
+
+class _RecentTransactionsState extends State<RecentTransactions> {
+  List<Map<String, Object?>> _filteredTransactions = [];
+  Map<String, double> _monthTotals = {};
+
+  List<Map<String, Object?>>? _lastTransactions;
+  TransactionFilter? _lastFilter;
+  DateFilter? _lastDateFilter;
+
+  void _updateCache(List<Map<String, Object?>> transactions) {
+    if (_lastTransactions == transactions &&
+        _lastFilter == widget.filter &&
+        _lastDateFilter == widget.dateFilter) {
+      return;
+    }
+
+    _lastTransactions = transactions;
+    _lastFilter = widget.filter;
+    _lastDateFilter = widget.dateFilter;
+
+    _filteredTransactions =
+        transactions.where((tx) {
+          final type = tx['type'] as String;
+          switch (widget.filter) {
+            case TransactionFilter.income:
+              if (type != 'income') return false;
+              break;
+            case TransactionFilter.expense:
+              if (type != 'expense') return false;
+              break;
+            case TransactionFilter.all:
+              break;
+          }
+
+          if (widget.dateFilter != null) {
+            final txDate = DateTime.fromMillisecondsSinceEpoch(
+              tx['transaction_timestamp'] as int,
+            );
+
+            if (widget.dateFilter!.mode == DateFilterMode.month) {
+              if (txDate.year != widget.dateFilter!.date.year ||
+                  txDate.month != widget.dateFilter!.date.month) {
+                return false;
+              }
+            } else {
+              if (txDate.year != widget.dateFilter!.date.year ||
+                  txDate.month != widget.dateFilter!.date.month ||
+                  txDate.day != widget.dateFilter!.date.day) {
+                return false;
+              }
+            }
+          }
+
+          return true;
+        }).toList()..sort(
+          (a, b) => (b['transaction_timestamp'] as int).compareTo(
+            a['transaction_timestamp'] as int,
+          ),
+        );
+
+    _monthTotals = _buildMonthTotals(_filteredTransactions);
+  }
 
   Map<String, double> _buildMonthTotals(
     List<Map<String, Object?>> transactions,
@@ -42,6 +109,29 @@ class RecentTransactions extends StatelessWidget {
     return totals;
   }
 
+  String _monthLabel(int timestamp) {
+    final date = DateTime.fromMillisecondsSinceEpoch(timestamp);
+    return "${_monthName(date.month)} ${date.year}";
+  }
+
+  String _monthName(int month) {
+    const months = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ];
+    return months[month - 1];
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<TransactionBloc, TransactionState>(
@@ -53,60 +143,20 @@ class RecentTransactions extends StatelessWidget {
         }
 
         if (state is TransactionLoaded) {
-          final filteredTransactions =
-              state.transactions.where((tx) {
-                final type = tx['type'] as String;
-                switch (filter) {
-                  case TransactionFilter.income:
-                    if (type != 'income') return false;
-                    break;
-                  case TransactionFilter.expense:
-                    if (type != 'expense') return false;
-                    break;
-                  case TransactionFilter.all:
-                    break;
-                }
+          _updateCache(state.transactions);
 
-                if (dateFilter != null) {
-                  final txDate = DateTime.fromMillisecondsSinceEpoch(
-                    tx['transaction_timestamp'] as int,
-                  );
-
-                  if (dateFilter!.mode == DateFilterMode.month) {
-                    if (txDate.year != dateFilter!.date.year ||
-                        txDate.month != dateFilter!.date.month) {
-                      return false;
-                    }
-                  } else {
-                    if (txDate.year != dateFilter!.date.year ||
-                        txDate.month != dateFilter!.date.month ||
-                        txDate.day != dateFilter!.date.day) {
-                      return false;
-                    }
-                  }
-                }
-
-                return true;
-              }).toList()..sort(
-                (a, b) => (b['transaction_timestamp'] as int).compareTo(
-                  a['transaction_timestamp'] as int,
-                ),
-              );
-
-          if (filteredTransactions.isEmpty) {
+          if (_filteredTransactions.isEmpty) {
             return const SliverFillRemaining(
               child: Center(child: Text('No transactions yet')),
             );
           }
 
-          final monthTotals = _buildMonthTotals(filteredTransactions);
-
           return BlocBuilder<CurrencyCubit, AppCurrency>(
             builder: (context, currency) {
               return AnimationLimiter(
-                child: SliverList(
+                child: SuperSliverList(
                   delegate: SliverChildBuilderDelegate((context, index) {
-                    final tx = filteredTransactions[index];
+                    final tx = _filteredTransactions[index];
 
                     final timestamp = tx['transaction_timestamp'] as int;
                     final categoryId = tx['category_id'] as String;
@@ -117,13 +167,13 @@ class RecentTransactions extends StatelessWidget {
                     final previousMonth = index == 0
                         ? null
                         : _monthLabel(
-                            filteredTransactions[index -
+                            _filteredTransactions[index -
                                     1]['transaction_timestamp']
                                 as int,
                           );
 
                     final showHeader = currentMonth != previousMonth;
-                    final monthTotal = monthTotals[currentMonth] ?? 0;
+                    final monthTotal = _monthTotals[currentMonth] ?? 0;
                     final isPositive = monthTotal >= 0;
 
                     return AnimationConfiguration.staggeredList(
@@ -177,7 +227,7 @@ class RecentTransactions extends StatelessWidget {
                         ),
                       ),
                     );
-                  }, childCount: filteredTransactions.length),
+                  }, childCount: _filteredTransactions.length),
                 ),
               );
             },
@@ -187,29 +237,6 @@ class RecentTransactions extends StatelessWidget {
         return const SliverToBoxAdapter(child: SizedBox.shrink());
       },
     );
-  }
-
-  String _monthLabel(int timestamp) {
-    final date = DateTime.fromMillisecondsSinceEpoch(timestamp);
-    return "${_monthName(date.month)} ${date.year}";
-  }
-
-  String _monthName(int month) {
-    const months = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
-    ];
-    return months[month - 1];
   }
 }
 

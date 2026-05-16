@@ -4,6 +4,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:spring_autumn/Bloc/currency/currency_cubit.dart';
 import 'package:spring_autumn/Widgets/Custom/custom_bold_text.dart';
+import 'package:spring_autumn/Widgets/Custom/custom_scroll_physics.dart';
 
 // Dummy Model for Savings
 class SavingsGoal {
@@ -195,7 +196,7 @@ class _AddSavingSheetState extends State<AddSavingSheet> {
           const SizedBox(height: 8),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
+            physics: const BouncingScrollPhysicsModified(),
             child: Row(
               children: _icons.map((icon) {
                 final isSelected = _selectedIcon == icon;
@@ -232,7 +233,7 @@ class _AddSavingSheetState extends State<AddSavingSheet> {
           const SizedBox(height: 8),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
+            physics: const BouncingScrollPhysicsModified(),
             child: Row(
               children: _colors.map((color) {
                 final isSelected = _selectedColor == color;
@@ -324,7 +325,7 @@ class _SavingsPageState extends State<SavingsPage>
 
             return Scaffold(
               body: CustomScrollView(
-                physics: const BouncingScrollPhysics(),
+                physics: const BouncingScrollPhysicsModified(),
                 slivers: [
                   // Header / Total Savings Hero Card
                   SliverToBoxAdapter(

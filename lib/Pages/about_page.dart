@@ -6,6 +6,7 @@ import 'package:spring_autumn/Widgets/Custom/custom_bold_text.dart';
 import 'package:spring_autumn/Widgets/Custom/custom_primary_text.dart';
 import 'package:spring_autumn/Widgets/Custom/custom_snackbar.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:spring_autumn/Widgets/Custom/custom_scroll_physics.dart';
 
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
@@ -14,7 +15,7 @@ class AboutPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: CustomScrollView(
-        physics: const BouncingScrollPhysics(),
+        physics: const BouncingScrollPhysicsModified(),
         slivers: [
           SliverToBoxAdapter(child: AboutContainer()),
           SliverPadding(

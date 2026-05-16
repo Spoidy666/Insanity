@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:spring_autumn/Theme/glass.dart';
 import 'package:spring_autumn/Widgets/Custom/custom_primary_text.dart';
+import 'package:spring_autumn/Widgets/Custom/custom_scroll_physics.dart';
 
 class GlassSettingsPage extends StatelessWidget {
   const GlassSettingsPage({super.key});
@@ -20,7 +21,7 @@ class GlassSettingsPage extends StatelessWidget {
             ),
           ),
           SingleChildScrollView(
-            physics: BouncingScrollPhysics(),
+            physics: BouncingScrollPhysicsModified(),
             padding: const EdgeInsets.symmetric(horizontal: 15),
             child: ValueListenableBuilder<GlassConfig>(
               valueListenable: glassConfig,

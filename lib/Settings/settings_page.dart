@@ -19,6 +19,7 @@ import 'package:spring_autumn/Widgets/Custom/custom_primary_text.dart';
 import 'package:spring_autumn/Widgets/default_payment_method.dart';
 import 'package:spring_autumn/Widgets/importAndExport/import_export.dart';
 import 'package:spring_autumn/Widgets/theme_toggle.dart';
+import 'package:spring_autumn/Widgets/Custom/custom_scroll_physics.dart';
 
 class SettingsPage extends StatelessWidget {
   final void Function(OverlayPage page)? onOverlayNavigate;
@@ -30,7 +31,7 @@ class SettingsPage extends StatelessWidget {
 
     return Scaffold(
       body: SingleChildScrollView(
-        physics: BouncingScrollPhysics(),
+        physics: BouncingScrollPhysicsModified(),
         padding: const EdgeInsets.symmetric(horizontal: 15),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

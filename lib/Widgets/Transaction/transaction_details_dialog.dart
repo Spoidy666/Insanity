@@ -5,6 +5,7 @@ import 'package:spring_autumn/Bloc/currency/currency_cubit.dart';
 import 'package:spring_autumn/Model/transaction_model.dart';
 import 'package:spring_autumn/Widgets/Custom/custom_button_one.dart';
 import 'package:spring_autumn/Widgets/Transaction/edit_transaction_sheet.dart';
+import 'package:spring_autumn/Widgets/Custom/custom_scroll_physics.dart';
 
 void showTransactionDetailsDialog(
   BuildContext context, {
@@ -28,7 +29,7 @@ void showTransactionDetailsDialog(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
+                    physics: const BouncingScrollPhysicsModified(),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [

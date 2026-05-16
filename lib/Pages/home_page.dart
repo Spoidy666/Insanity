@@ -4,6 +4,7 @@ import 'package:spring_autumn/Model/transaction_model.dart';
 import 'package:spring_autumn/Widgets/Custom/custom_bold_text.dart';
 import 'package:spring_autumn/Widgets/Cards/home_balance_container.dart';
 import 'package:spring_autumn/Widgets/Transaction/recent_transactions.dart';
+import 'package:spring_autumn/Widgets/Custom/custom_scroll_physics.dart';
 
 final ValueNotifier<DateFilter?> selectedFilterNotifier =
     ValueNotifier<DateFilter?>(null);
@@ -28,7 +29,7 @@ class _HomePageState extends State<HomePage>
         valueListenable: selectedFilterNotifier,
         builder: (context, dateFilter, _) {
           return CustomScrollView(
-            physics: const BouncingScrollPhysics(),
+            physics: const BouncingScrollPhysicsModified(),
             slivers: [
               SliverToBoxAdapter(
                 child: Column(

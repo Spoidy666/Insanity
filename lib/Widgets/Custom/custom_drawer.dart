@@ -7,6 +7,7 @@ import 'package:spring_autumn/Widgets/Custom/custom_icon_button_one.dart';
 import 'package:spring_autumn/Widgets/drawer_button.dart';
 import 'package:spring_autumn/Widgets/drawer_theme_toggle.dart';
 import 'package:spring_autumn/Widgets/importAndExport/import_export.dart';
+import 'package:spring_autumn/Widgets/Custom/custom_scroll_physics.dart';
 
 class CustomDrawer extends StatelessWidget {
   final void Function(int index) onItemTap;
@@ -57,7 +58,7 @@ class CustomDrawer extends StatelessWidget {
 
                   Expanded(
                     child: SingleChildScrollView(
-                      physics: const BouncingScrollPhysics(),
+                      physics: const BouncingScrollPhysicsModified(),
                       child: Column(
                         children: [
                           CustomDrawerButton(

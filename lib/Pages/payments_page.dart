@@ -5,6 +5,7 @@ import 'package:spring_autumn/Widgets/Custom/custom_bold_text.dart';
 import 'package:spring_autumn/Widgets/Graphs/piechart.dart';
 import 'package:spring_autumn/Widgets/Transaction/recent_transactions.dart';
 import 'package:spring_autumn/Model/transaction_model.dart';
+import 'package:spring_autumn/Widgets/Custom/custom_scroll_physics.dart';
 
 final ValueNotifier<DateFilter?> paymentsFilterNotifier =
     ValueNotifier<DateFilter?>(null);
@@ -31,7 +32,7 @@ class _PaymentsPageState extends State<PaymentsPage>
         valueListenable: paymentsFilterNotifier,
         builder: (context, dateFilter, _) {
           return CustomScrollView(
-            physics: const BouncingScrollPhysics(),
+            physics: const BouncingScrollPhysicsModified(),
             slivers: [
               SliverToBoxAdapter(
                 child: Padding(
@@ -148,7 +149,7 @@ class _PaymentsPageState extends State<PaymentsPage>
               SliverToBoxAdapter(
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
-                  physics: const BouncingScrollPhysics(),
+                  physics: const BouncingScrollPhysicsModified(),
                   child: Row(
                     children: [
                       SizedBox(

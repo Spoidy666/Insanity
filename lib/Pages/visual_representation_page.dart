@@ -5,6 +5,7 @@ import 'package:spring_autumn/Widgets/modern_type_tab.dart';
 import 'package:spring_autumn/Widgets/Graphs/piechart.dart';
 import 'package:spring_autumn/Widgets/Graphs/line_chart.dart';
 import 'package:spring_autumn/Model/transaction_model.dart';
+import 'package:spring_autumn/Widgets/Custom/custom_scroll_physics.dart';
 
 class VisualRepresentationPage extends StatefulWidget {
   const VisualRepresentationPage({super.key});
@@ -193,7 +194,7 @@ class ChartsSection extends StatelessWidget {
         );
       },
       child: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
+        physics: const BouncingScrollPhysicsModified(),
         key: ValueKey(
           '${type.name}-${dateFilter?.mode.name ?? "all"}-${dateFilter?.date.day ?? ""}-${dateFilter?.date.month ?? ""}-${dateFilter?.date.year ?? ""}',
         ),

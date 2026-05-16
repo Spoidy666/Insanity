@@ -99,84 +99,88 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    return DrawerScaffold(
-      currentIndex: _currentIndex,
-      onNavigate: (index) {
-        _onTabChange(index);
-        _popOverlay();
+    return PopScope(
+      canPop: !_hasOverlay,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop && _hasOverlay) _popOverlay();
       },
-      onOverlayNavigate: _pushOverlay,
-      activeOverlay: _currentOverlay,
-      key: _drawerKey,
-      child: SafeArea(
-        top: false,
-        child: Scaffold(
-          appBar: CustomAppBar(
-            title: _currentOverlay?.label ?? "",
-            showBackButton: _hasOverlay,
-            onBackTap: _popOverlay,
-            onMenuTap: () => _drawerKey.currentState?.toggleDrawer(),
-            onSettingsTap: () => _pushOverlay(OverlayPage.settings),
-            isSettingsActive: _currentOverlay == OverlayPage.settings,
-          ),
-          body: ValueListenableBuilder<GlassConfig>(
-            valueListenable: glassConfig,
-            builder: (context, config, _) {
-              return Stack(
-                children: [
-                  PageView(
-                    controller: _pageController,
-                    physics: const NeverScrollableScrollPhysics(),
-                    children: _pages,
-                  ),
-                  AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 300),
-                    switchInCurve: Curves.easeInOutCubic,
-                    switchOutCurve: Curves.easeInOutCubic,
-                    transitionBuilder: (child, animation) {
-                      final slide = Tween<Offset>(
-                        begin: const Offset(1, 0),
-                        end: Offset.zero,
-                      ).animate(animation);
-                      return SlideTransition(position: slide, child: child);
-                    },
-                    child: _hasOverlay
-                        ? KeyedSubtree(
-                            key: ValueKey(
-                              _currentOverlay,
-                            ), // key drives the animation
-                            child: Container(
-                              color: Theme.of(context).colorScheme.surface,
-                              child: _buildOverlayWidget(_currentOverlay!),
-                            ),
-                          )
-                        : const SizedBox.shrink(),
-                  ),
-                  if (config.navbar)
-                    FloatingGlassNavBar(
-                      currentIndex: _currentIndex,
-                      onTap: _onTabChange,
+      child: DrawerScaffold(
+        currentIndex: _currentIndex,
+        onNavigate: (index) {
+          _onTabChange(index);
+          _popOverlay();
+        },
+        onOverlayNavigate: _pushOverlay,
+        activeOverlay: _currentOverlay,
+        key: _drawerKey,
+        child: SafeArea(
+          top: false,
+          child: Scaffold(
+            appBar: CustomAppBar(
+              title: _currentOverlay?.label ?? "",
+              showBackButton: _hasOverlay,
+              onBackTap: _popOverlay,
+              onMenuTap: () => _drawerKey.currentState?.toggleDrawer(),
+              onSettingsTap: () => _pushOverlay(OverlayPage.settings),
+              isSettingsActive: _currentOverlay == OverlayPage.settings,
+            ),
+            body: ValueListenableBuilder<GlassConfig>(
+              valueListenable: glassConfig,
+              builder: (context, config, _) {
+                return Stack(
+                  children: [
+                    PageView(
+                      controller: _pageController,
+                      physics: const NeverScrollableScrollPhysics(),
+                      children: _pages,
                     ),
-                  if (_buildFAB(config) != null && !_hasOverlay)
-                    Positioned(
-                      bottom: config.navbar ? 85 : 20,
-                      right: 20,
-                      child: _buildFAB(config)!,
+                    AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 300),
+                      switchInCurve: Curves.easeInOutCubic,
+                      switchOutCurve: Curves.easeInOutCubic,
+                      transitionBuilder: (child, animation) {
+                        final slide = Tween<Offset>(
+                          begin: const Offset(1, 0),
+                          end: Offset.zero,
+                        ).animate(animation);
+                        return SlideTransition(position: slide, child: child);
+                      },
+                      child: _hasOverlay
+                          ? KeyedSubtree(
+                              key: ValueKey(_currentOverlay),
+                              child: Container(
+                                color: Theme.of(context).colorScheme.surface,
+                                child: _buildOverlayWidget(_currentOverlay!),
+                              ),
+                            )
+                          : const SizedBox.shrink(),
                     ),
-                ],
-              );
-            },
-          ),
-          bottomNavigationBar: ValueListenableBuilder<GlassConfig>(
-            valueListenable: glassConfig,
-            builder: (context, config, _) {
-              return config.navbar
-                  ? const SizedBox.shrink()
-                  : CustomBottomNavBar(
-                      currentIndex: _currentIndex,
-                      onTap: _onTabChange,
-                    );
-            },
+                    if (config.navbar)
+                      FloatingGlassNavBar(
+                        currentIndex: _currentIndex,
+                        onTap: _onTabChange,
+                      ),
+                    if (_buildFAB(config) != null && !_hasOverlay)
+                      Positioned(
+                        bottom: config.navbar ? 85 : 20,
+                        right: 20,
+                        child: _buildFAB(config)!,
+                      ),
+                  ],
+                );
+              },
+            ),
+            bottomNavigationBar: ValueListenableBuilder<GlassConfig>(
+              valueListenable: glassConfig,
+              builder: (context, config, _) {
+                return config.navbar
+                    ? const SizedBox.shrink()
+                    : CustomBottomNavBar(
+                        currentIndex: _currentIndex,
+                        onTap: _onTabChange,
+                      );
+              },
+            ),
           ),
         ),
       ),
@@ -206,7 +210,7 @@ class _MainPageState extends State<MainPage> {
 
     switch (_currentIndex) {
       case 0:
-        return buildButton(Iconsax.wallet_add_1, () => openSheet());
+        return buildButton(Iconsax.card_add, () => openSheet());
       case 1:
         return buildButton(
           Iconsax.card_send,
