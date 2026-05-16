@@ -211,7 +211,7 @@ class DrawerScaffoldState extends State<DrawerScaffold>
   void _onDragEnd(DragEndDetails details) {
     final velocity = details.velocity.pixelsPerSecond.dx;
 
-    if (velocity.abs() > 200) {
+    if (velocity.abs() > 500) {
       if (velocity > 0) {
         _controller.forward();
       } else {
@@ -240,9 +240,6 @@ class DrawerScaffoldState extends State<DrawerScaffold>
 
   @override
   Widget build(BuildContext context) {
-    // Cache the drawer and main content outside the AnimatedBuilder
-    // so they don't rebuild every frame. Wrapped in RepaintBoundary
-    // so their pixels are rasterized once and then just transformed.
     final drawerContent = RepaintBoundary(
       child: CustomDrawer(
         onItemTap: navigateTo,
@@ -257,48 +254,54 @@ class DrawerScaffoldState extends State<DrawerScaffold>
     return GestureDetector(
       onHorizontalDragUpdate: _onDragUpdate,
       onHorizontalDragEnd: _onDragEnd,
-      child: AnimatedBuilder(
-        animation: _animation,
-        builder: (context, _) {
-          final slide = maxSlide * _animation.value;
-          final radius = 30 * _animation.value;
-
-          return Stack(
-            children: [
-              Opacity(
+      child: Stack(
+        children: [
+          AnimatedBuilder(
+            animation: _animation,
+            child: drawerContent,
+            builder: (context, child) {
+              return Opacity(
                 opacity: 0.7 + (0.3 * _animation.value),
                 child: Transform(
                   alignment: Alignment.centerLeft,
                   transform: Matrix4.identity()
                     ..translate(-60 * (1 - _animation.value))
                     ..scale(0.95 + (0.05 * _animation.value), 1.0),
-                  child: drawerContent,
+                  child: child,
                 ),
-              ),
-              Transform(
+              );
+            },
+          ),
+          AnimatedBuilder(
+            animation: _animation,
+            child: mainContent,
+            builder: (context, child) {
+              final slide = maxSlide * _animation.value;
+              final radius = 30 * _animation.value;
+              final overlayAlpha = 0.60 * _animation.value;
+
+              return Transform(
                 alignment: Alignment.centerLeft,
                 transform: Matrix4.identity()..translate(slide),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(radius),
                   child: Stack(
                     children: [
-                      mainContent,
+                      child!,
                       if (_animation.value > 0)
                         GestureDetector(
                           onTap: toggleDrawer,
                           child: Container(
-                            color: Colors.black.withValues(
-                              alpha: 0.60 * _animation.value,
-                            ),
+                            color: Colors.black.withValues(alpha: overlayAlpha),
                           ),
                         ),
                     ],
                   ),
                 ),
-              ),
-            ],
-          );
-        },
+              );
+            },
+          ),
+        ],
       ),
     );
   }

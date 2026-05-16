@@ -48,74 +48,14 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       actions: [
         if (!showBackButton)
-          _SpinningSettingsButton(
-            onTap: onSettingsTap ?? () {},
-            isActive: isSettingsActive,
+          IconButton(
+            onPressed: onSettingsTap ?? () {},
+            icon: Icon(
+              Iconsax.setting_24,
+              color: Theme.of(context).colorScheme.tertiary,
+            ),
           ),
       ],
-    );
-  }
-}
-
-class _SpinningSettingsButton extends StatefulWidget {
-  final VoidCallback onTap;
-  final bool isActive;
-
-  const _SpinningSettingsButton({required this.onTap, required this.isActive});
-
-  @override
-  State<_SpinningSettingsButton> createState() =>
-      _SpinningSettingsButtonState();
-}
-
-class _SpinningSettingsButtonState extends State<_SpinningSettingsButton>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-  late final Animation<double> _rotation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 400),
-    );
-    _rotation = Tween<double>(begin: 0, end: -1).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOutCubic),
-    );
-  }
-
-  @override
-  void didUpdateWidget(_SpinningSettingsButton oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.isActive && !oldWidget.isActive) {
-      _controller.forward();
-    } else if (!widget.isActive && oldWidget.isActive) {
-      _controller.reverse();
-    }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(
-      onPressed: widget.onTap,
-      icon: AnimatedBuilder(
-        animation: _rotation,
-        builder: (context, child) => Transform.rotate(
-          angle: _rotation.value * 2 * 3.14159,
-          child: child,
-        ),
-        child: Icon(
-          Iconsax.setting_24,
-          color: Theme.of(context).colorScheme.tertiary,
-        ),
-      ),
     );
   }
 }

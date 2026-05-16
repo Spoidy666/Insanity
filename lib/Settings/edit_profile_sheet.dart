@@ -25,9 +25,14 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
     super.initState();
     final profile = context.read<ProfileCubit>().state;
 
-    nameController.text = profile.name;
-    emailController.text = profile.email;
-    phoneController.text = profile.phone;
+    final pName = profile.name.trim().toLowerCase();
+    nameController.text = (pName == "name" || pName == "your name") ? "" : profile.name;
+    
+    final pEmail = profile.email.trim().toLowerCase();
+    emailController.text = (pEmail == "youremail@gmail.com") ? "" : profile.email;
+    
+    final pPhone = profile.phone.trim().toLowerCase();
+    phoneController.text = (pPhone == "xxxxxxxxxx") ? "" : profile.phone;
   }
 
   @override
@@ -176,9 +181,9 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                   text: "Save Changes",
                   onTap: () {
                     final updated = context.read<ProfileCubit>().state.copyWith(
-                      name: nameController.text.trim(),
-                      email: emailController.text.trim(),
-                      phone: phoneController.text.trim(),
+                      name: nameController.text.trim().isEmpty ? "Name" : nameController.text.trim(),
+                      email: emailController.text.trim().isEmpty ? "youremail@gmail.com" : emailController.text.trim(),
+                      phone: phoneController.text.trim().isEmpty ? "XXXXXXXXXX" : phoneController.text.trim(),
                     );
                     context.read<ProfileCubit>().updateProfile(updated);
                     Navigator.pop(context);
