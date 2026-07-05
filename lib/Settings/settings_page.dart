@@ -181,7 +181,7 @@ class SettingsPage extends StatelessWidget {
                 ),
                 UtilityRow(
                   icon: Iconsax.designtools,
-                  title: "Frosted Glass Theme",
+                  title: "Glass Theme",
                   onTap: () {
                     onOverlayNavigate?.call(OverlayPage.glass);
                   },

@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 
 class FloatingGlassNavBar extends StatelessWidget {
   final int currentIndex;
@@ -15,56 +16,31 @@ class FloatingGlassNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      left: 16,
-      right: 16,
+      left: 20,
+      right: 20,
       bottom: 6,
 
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-          child: Container(
-            height: 65,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              gradient: LinearGradient(
-                colors: [
-                  Colors.white.withValues(alpha: 0.08),
-                  Colors.white.withValues(alpha: 0.04),
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-              border: Border.all(
-                color: Theme.of(
-                  context,
-                ).colorScheme.tertiary.withValues(alpha: 0.15),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.15),
-                  blurRadius: 12,
-                  offset: Offset(0, 6),
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children:
-                  [
-                    _NavItem(icon: Iconsax.home_2, index: 0),
-                    _NavItem(icon: Iconsax.wallet, index: 1),
-                    _NavItem(icon: Iconsax.money, index: 2),
-                    _NavItem(icon: Iconsax.wallet_money, index: 3),
-                    _NavItem(icon: Iconsax.graph, index: 4),
-                  ].map((item) {
-                    return item.build(
-                      context: context,
-                      isActive: currentIndex == item.index,
-                      onTap: () => onTap(item.index),
-                    );
-                  }).toList(),
-            ),
+      child: LiquidGlass(
+        shape: LiquidRoundedSuperellipse(borderRadius: 26),
+        child: Container(
+          height: 65,
+
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children:
+                [
+                  _NavItem(icon: Iconsax.home_2, index: 0),
+                  _NavItem(icon: Iconsax.wallet, index: 1),
+                  _NavItem(icon: Iconsax.money, index: 2),
+                  _NavItem(icon: Iconsax.wallet_money, index: 3),
+                  _NavItem(icon: Iconsax.graph, index: 4),
+                ].map((item) {
+                  return item.build(
+                    context: context,
+                    isActive: currentIndex == item.index,
+                    onTap: () => onTap(item.index),
+                  );
+                }).toList(),
           ),
         ),
       ),
@@ -94,12 +70,12 @@ class _NavItem {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
           color: isActive
-              ? colorScheme.tertiary.withValues(alpha: 0.15)
+              ? colorScheme.tertiary.withValues(alpha: 0.12)
               : Colors.transparent,
         ),
         child: Icon(
           icon,
-          size: 26,
+          size: isActive ? 28 : 26,
           color: isActive
               ? colorScheme.tertiary
               : colorScheme.onSurface.withValues(alpha: 0.6),

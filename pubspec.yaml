@@ -45,6 +45,7 @@ dependencies:
   iconsax: ^0.0.8
   image_picker: ^1.2.1
   intl: ^0.20.2
+  liquid_glass_renderer: ^0.2.0-dev.4
   package_info_plus: ^9.0.0
   path: ^1.9.1
   path_provider: ^2.1.5

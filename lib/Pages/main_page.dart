@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 import 'package:spring_autumn/Pages/about_page.dart';
 import 'package:spring_autumn/Pages/home_page.dart';
 import 'package:spring_autumn/Pages/payments_page.dart';
@@ -15,9 +16,10 @@ import 'package:spring_autumn/Widgets/Custom/custom_bottom_navbar.dart';
 import 'package:spring_autumn/Widgets/Custom/custom_drawer.dart';
 import 'package:spring_autumn/Widgets/Custom/custom_floating_action_button.dart';
 import 'package:spring_autumn/Widgets/Custom/custom_floating_navbar.dart';
-import 'package:spring_autumn/Widgets/Custom/custom_glass_floating_action_button.dart';
+import 'package:spring_autumn/Widgets/Glass/custom_glass_floating_action_button.dart';
 import 'package:spring_autumn/Widgets/Transaction/add_transaction_sheet.dart';
 import 'package:spring_autumn/Model/transaction_model.dart';
+import 'dart:math';
 
 enum OverlayPage { settings, graphs, glass, about }
 
@@ -155,17 +157,29 @@ class _MainPageState extends State<MainPage> {
                             )
                           : const SizedBox.shrink(),
                     ),
-                    if (config.navbar)
-                      FloatingGlassNavBar(
-                        currentIndex: _currentIndex,
-                        onTap: _onTabChange,
+                    LiquidGlassLayer(
+                      settings: LiquidGlassSettings(
+                        thickness: 25,
+                        lightAngle: pi / 2,
+                        chromaticAberration: 0.15,
                       ),
-                    if (_buildFAB(config) != null && !_hasOverlay)
-                      Positioned(
-                        bottom: config.navbar ? 85 : 20,
-                        right: 20,
-                        child: _buildFAB(config)!,
+                      child: Stack(
+                        children: [
+                          if (config.navbar)
+                            FloatingGlassNavBar(
+                              currentIndex: _currentIndex,
+                              onTap: _onTabChange,
+                            ),
+
+                          if (_buildFAB(config) != null && !_hasOverlay)
+                            Positioned(
+                              bottom: config.navbar ? 85 : 20,
+                              right: 20,
+                              child: _buildFAB(config)!,
+                            ),
+                        ],
                       ),
+                    ),
                   ],
                 );
               },
@@ -233,7 +247,7 @@ extension OverlayPageLabel on OverlayPage {
   String get label => switch (this) {
     OverlayPage.settings => "Settings",
     OverlayPage.graphs => "Graph View",
-    OverlayPage.glass => "Frosted Glass Theme",
+    OverlayPage.glass => "Glass Theme",
     OverlayPage.about => "About ",
   };
 }
